@@ -1,4 +1,4 @@
-# Steam 數據管線專案 Python 依賴套件
+# Steam 資料管線專案 Python 依賴套件
 
 # Kafka Client (使用 ng 版本支援新版 Python)
 kafka-python-ng==2.2.2

@@ -46,7 +46,7 @@ services:
       # 允許 default 使用者透過網路連線（新版映像預設會關閉）
       - CLICKHOUSE_SKIP_USER_SETUP=1
 
-  # 3. 視覺化儀表板 (Grafana)
+  # 3. 視覺化儀錶板 (Grafana)
   grafana:
     image: grafana/grafana:latest
     container_name: grafana

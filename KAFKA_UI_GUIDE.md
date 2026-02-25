@@ -6,13 +6,13 @@ Kafka UI 是一個開源的 Kafka 管理介面，可以視覺化地監控和管�
 
 ### 功能特色
 
-- ✅ 查看所有 Topics 列表
-- ✅ 即時查看訊息內容
+- ✅ 檢視所有 Topics 列表
+- ✅ 即時檢視訊息內容
 - ✅ 監控 Consumer Groups 狀態
-- ✅ 查看 Brokers 資訊
-- ✅ 手動發送測試訊息
+- ✅ 檢視 Brokers 資訊
+- ✅ 手動傳送測試訊息
 - ✅ 管理 Topics（建立、刪除、設定）
-- ✅ 查看 Consumer Lag（延遲）
+- ✅ 檢視 Consumer Lag（延遲）
 
 ---
 
@@ -35,7 +35,7 @@ docker ps | grep kafka-ui
 # 啟動 Kafka UI
 docker-compose up -d kafka-ui
 
-# 查看啟動日誌
+# 檢視啟動日誌
 docker logs -f kafka-ui
 ```
 
@@ -63,24 +63,24 @@ docker logs -f kafka-ui
 
 ### 2. Topics 管理
 
-**查看 Topics 列表**
-- 點擊左側選單 **Topics**
+**檢視 Topics 列表**
+- 點選左側選單 **Topics**
 - 可看到所有 Topics：
   - `steam_top_games_topic`
   - `steam_game_details_topic`
 
-**查看 Topic 詳情**
-- 點擊 Topic 名稱
+**檢視 Topic 詳情**
+- 點選 Topic 名稱
 - 可看到：
   - Partitions 數量
   - Replication Factor
   - 訊息總數
   - 各 Partition 的 Offset
 
-**查看訊息內容**
-1. 點擊 Topic 名稱
-2. 點擊 **Messages** 頁籤
-3. 點擊 **Fetch Messages**
+**檢視訊息內容**
+1. 點選 Topic 名稱
+2. 點選 **Messages** 頁籤
+3. 點選 **Fetch Messages**
 4. 可看到實際的 JSON 訊息內容
 
 範例訊息：
@@ -95,11 +95,11 @@ docker logs -f kafka-ui
 }
 ```
 
-**發送測試訊息**
-1. 點擊 Topic 名稱
-2. 點擊 **Produce Message**
+**傳送測試訊息**
+1. 點選 Topic 名稱
+2. 點選 **Produce Message**
 3. 輸入 JSON 格式的訊息
-4. 點擊 **Send**
+4. 點選 **Send**
 
 範例：
 ```json
@@ -115,14 +115,14 @@ docker logs -f kafka-ui
 
 ### 3. Consumer Groups 監控
 
-**查看 Consumer Groups**
-- 點擊左側選單 **Consumers**
+**檢視 Consumer Groups**
+- 點選左側選單 **Consumers**
 - 可看到：
   - `clickhouse_steam_top_games_consumer`
   - `clickhouse_steam_game_details_consumer`
 
-**查看 Consumer 狀態**
-- 點擊 Consumer Group 名稱
+**檢視 Consumer 狀態**
+- 點選 Consumer Group 名稱
 - 可看到：
   - 訂閱的 Topics
   - 各 Partition 的 Offset
@@ -140,8 +140,8 @@ Partition 2: Current Offset: 1000, Log End Offset: 1000, Lag: 0 ✓
 
 ### 4. Brokers 資訊
 
-**查看 Broker 狀態**
-- 點擊左側選單 **Brokers**
+**檢視 Broker 狀態**
+- 點選左側選單 **Brokers**
 - 可看到：
   - Broker ID
   - 主機位址
@@ -152,25 +152,25 @@ Partition 2: Current Offset: 1000, Log End Offset: 1000, Lag: 0 ✓
 
 ## 實際操作範例
 
-### 範例 1: 確認 Producer 有在發送訊息
+### 範例 1: 確認 Producer 有在傳送訊息
 
 1. 開啟 Kafka UI：http://localhost:8080
-2. 點擊 **Topics** → **steam_top_games_topic**
-3. 查看 **Messages** 頁籤
-4. 點擊 **Fetch Messages**
+2. 點選 **Topics** → **steam_top_games_topic**
+3. 檢視 **Messages** 頁籤
+4. 點選 **Fetch Messages**
 5. 應該可以看到 Steam 遊戲資料的 JSON 訊息
 
 ### 範例 2: 檢查 ClickHouse 是否正常消費
 
-1. 點擊 **Consumers** → **clickhouse_steam_top_games_consumer**
-2. 查看各 Partition 的 **Lag**
+1. 點選 **Consumers** → **clickhouse_steam_top_games_consumer**
+2. 檢視各 Partition 的 **Lag**
 3. 如果 Lag = 0，表示 ClickHouse 正常消費
 4. 如果 Lag 持續增加，表示有問題需要檢查
 
-### 範例 3: 手動發送測試訊息
+### 範例 3: 手動傳送測試訊息
 
-1. 點擊 **Topics** → **steam_top_games_topic**
-2. 點擊 **Produce Message**
+1. 點選 **Topics** → **steam_top_games_topic**
+2. 點選 **Produce Message**
 3. 貼上測試 JSON：
 ```json
 {
@@ -182,7 +182,7 @@ Partition 2: Current Offset: 1000, Log End Offset: 1000, Lag: 0 ✓
   "fetch_time": "2024-02-24 15:00:00"
 }
 ```
-4. 點擊 **Send**
+4. 點選 **Send**
 5. 到 ClickHouse 查詢，應該會看到這筆測試資料
 
 ```bash
@@ -192,8 +192,8 @@ docker exec clickhouse-server clickhouse-client --query \
 
 ### 範例 4: 監控資料流量
 
-1. 點擊 **Topics** → **steam_top_games_topic**
-2. 查看 **Overview** 頁籤
+1. 點選 **Topics** → **steam_top_games_topic**
+2. 檢視 **Overview** 頁籤
 3. 觀察 **Messages per second**（每秒訊息數）
 4. 觀察 **Bytes per second**（每秒位元組數）
 
@@ -259,19 +259,19 @@ docker logs clickhouse-server | grep -i kafka
 | 功能 | Kafka UI | Grafana |
 |------|---------|---------|
 | **用途** | 監控 Kafka | 視覺化資料分析 |
-| **監控對象** | Topics, Messages, Consumers | ClickHouse 資料 |
+| **監控物件** | Topics, Messages, Consumers | ClickHouse 資料 |
 | **即時性** | 即時 | 近即時（取決於查詢） |
-| **訊息查看** | ✅ 可以看原始訊息 | ❌ 只能看聚合資料 |
+| **訊息檢視** | ✅ 可以看原始訊息 | ❌ 只能看聚合資料 |
 | **Consumer Lag** | ✅ 可以監控 | ❌ 需要自己寫查詢 |
 | **資料分析** | ❌ 只能看原始資料 | ✅ 豐富的圖表 |
-| **手動發送訊息** | ✅ 支援 | ❌ 不支援 |
+| **手動傳送訊息** | ✅ 支援 | ❌ 不支援 |
 
 **建議使用情境**:
 - 除錯 Kafka 問題 → **Kafka UI**
-- 查看訊息內容 → **Kafka UI**
+- 檢視訊息內容 → **Kafka UI**
 - 監控 Consumer Lag → **Kafka UI**
 - 分析遊戲趨勢 → **Grafana**
-- 建立儀表板 → **Grafana**
+- 建立儀錶板 → **Grafana**
 
 ---
 
@@ -279,27 +279,27 @@ docker logs clickhouse-server | grep -i kafka
 
 ### 1. 建立新 Topic
 
-1. 點擊 **Topics** → **Create Topic**
+1. 點選 **Topics** → **Create Topic**
 2. 輸入 Topic 名稱
 3. 設定 Partitions 數量
 4. 設定 Replication Factor
-5. 點擊 **Create**
+5. 點選 **Create**
 
 ### 2. 修改 Topic 設定
 
-1. 點擊 Topic 名稱
-2. 點擊 **Settings**
+1. 點選 Topic 名稱
+2. 點選 **Settings**
 3. 可修改：
    - Retention Time（保留時間）
    - Segment Size（分段大小）
-   - Compression Type（壓縮類型）
+   - Compression Type（壓縮型別）
 
 ### 3. 刪除訊息
 
-1. 點擊 Topic 名稱
-2. 點擊 **Messages**
+1. 點選 Topic 名稱
+2. 點選 **Messages**
 3. 選擇要刪除的訊息
-4. 點擊 **Delete**
+4. 點選 **Delete**
 
 **⚠️ 注意**: 刪除訊息是永久的！
 
@@ -311,14 +311,14 @@ docker logs clickhouse-server | grep -i kafka
 |--------|------|
 | `Ctrl + K` | 全域搜尋 |
 | `Ctrl + R` | 重新整理 |
-| `Esc` | 關閉對話框 |
+| `Esc` | 關閉對話方塊 |
 
 ---
 
 ## 相關連結
 
 - Kafka UI GitHub: https://github.com/provectus/kafka-ui
-- 官方文件: https://docs.kafka-ui.provectus.io/
+- 官方檔案: https://docs.kafka-ui.provectus.io/
 
 ---
 
@@ -335,5 +335,5 @@ docker logs clickhouse-server | grep -i kafka
 
 ---
 
-**專案作者**: 資深數據工程師
+**專案作者**: 資深資料工程師
 **最後更新**: 2024-02-24

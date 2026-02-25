@@ -1,15 +1,15 @@
-# Steam 數據管線專案概覽
+# Steam 資料管線專案概覽
 
 ## 專案簡介
 
-這是一個完整的即時數據管線 POC 專案，展示如何使用現代數據工程技術棧建立微服務數據匯流平台。
+這是一個完整的即時資料管線 POC 專案，展示如何使用現代資料工程技術棧建立微服務資料匯流平臺。
 
 ### 核心價值
 
 - **即時性**: 10 分鐘更新一次熱門遊戲玩家統計
-- **可擴展**: 微服務架構，易於橫向擴展
+- **可擴充套件**: 微服務架構，易於橫向擴充套件
 - **高效能**: ClickHouse 提供毫秒級查詢響應
-- **視覺化**: Grafana 提供豐富的圖表和儀表板
+- **視覺化**: Grafana 提供豐富的圖表和儀錶板
 
 ## 技術架構
 
@@ -60,7 +60,7 @@
 - 處理邏輯:
   1. 從 Steam Spy 獲取熱門遊戲列表
   2. 逐一查詢每款遊戲的即時玩家數
-  3. 格式化為 JSON 並發送到 Kafka
+  3. 格式化為 JSON 並傳送到 Kafka
 - Rate Limit 控制: 每 10 個請求休息 1 秒
 
 **steam_game_details_producer.py**
@@ -70,15 +70,15 @@
 - 處理邏輯:
   1. 獲取熱門遊戲 AppID 列表
   2. 查詢每款遊戲的 Store API
-  3. 解析價格、評價、類型等資訊
-  4. 發送到 Kafka
+  3. 解析價格、評價、型別等資訊
+  4. 傳送到 Kafka
 - Rate Limit 控制: 每個請求間隔 1.5 秒
 
 ### 2. 訊息佇列層 (Message Queue)
 
 **Kafka Topics 設計**
 
-| Topic | Partitions | Replication | 資料類型 | 更新頻率 |
+| Topic | Partitions | Replication | 資料型別 | 更新頻率 |
 |-------|-----------|-------------|---------|---------|
 | steam_top_games_topic | 3 | 1 | 玩家統計 | 10 分鐘 |
 | steam_game_details_topic | 3 | 1 | 遊戲詳情 | 1 小時 |
@@ -86,7 +86,7 @@
 **為什麼使用 Kafka?**
 - 解耦生產者和消費者
 - 資料緩衝，避免 ClickHouse 寫入壓力
-- 支援多個消費者（未來可擴展）
+- 支援多個消費者（未來可擴充套件）
 - 資料持久化，防止資料遺失
 
 ### 3. 資料儲存層 (Data Storage)
@@ -106,14 +106,14 @@ MergeTree Table (持久化儲存)
 **資料表設計**
 
 **steam_top_games** (玩家統計表)
-- 分區鍵: `toYYYYMMDD(fetch_time)` - 按日分區
-- 排序鍵: `(game_id, fetch_time)` - 優化遊戲查詢
+- 分割槽鍵: `toYYYYMMDD(fetch_time)` - 按日分割槽
+- 排序鍵: `(game_id, fetch_time)` - 最佳化遊戲查詢
 - TTL: 90 天 - 自動清理舊資料
 - 預估資料量: 100 遊戲 × 6 次/小時 × 24 小時 = 14,400 筆/天
 
 **steam_game_details** (遊戲詳情表)
-- 分區鍵: `toYYYYMM(fetch_time)` - 按月分區
-- 排序鍵: `(game_id, fetch_time)` - 優化遊戲查詢
+- 分割槽鍵: `toYYYYMM(fetch_time)` - 按月分割槽
+- 排序鍵: `(game_id, fetch_time)` - 最佳化遊戲查詢
 - TTL: 180 天 - 保留更長時間
 - 預估資料量: 100 遊戲 × 24 次/天 = 2,400 筆/天
 
@@ -127,17 +127,17 @@ MergeTree Table (持久化儲存)
 
 **Grafana Dashboard 設計**
 
-**Panel 類型與用途**
+**Panel 型別與用途**
 
-| Panel 類型 | 用途 | 資料來源 | 刷新頻率 |
+| Panel 型別 | 用途 | 資料來源 | 重新整理頻率 |
 |-----------|------|---------|---------|
 | Stat | 總覽統計 | steam_top_games | 1 分鐘 |
 | Table | 遊戲排行榜 | steam_top_games | 1 分鐘 |
 | Time Series | 玩家數趨勢 | steam_top_games | 1 分鐘 |
-| Bar Chart | 類型分布 | JOIN 兩表 | 5 分鐘 |
-| Pie Chart | 遊戲類型佔比 | steam_game_details | 5 分鐘 |
+| Bar Chart | 型別分佈 | JOIN 兩表 | 5 分鐘 |
+| Pie Chart | 遊戲型別佔比 | steam_game_details | 5 分鐘 |
 
-**關鍵查詢優化**
+**關鍵查詢最佳化**
 - 使用 `argMax()` 獲取最新資料，避免排序
 - 使用 `$__timeFilter()` 限制時間範圍
 - 建立 Grafana 變數，實現動態過濾
@@ -147,8 +147,8 @@ MergeTree Table (持久化儲存)
 
 ```
 kafka/
-├── README.md                           # 專案說明文件
-├── PROJECT_OVERVIEW.md                 # 專案概覽（本文件）
+├── README.md                           # 專案說明檔案
+├── PROJECT_OVERVIEW.md                 # 專案概覽（本檔案）
 ├── docker-compose.yml                  # 基礎設施定義
 ├── clickhouse_schema.sql               # ClickHouse 資料表定義
 ├── grafana_queries.sql                 # Grafana 查詢範例
@@ -158,7 +158,7 @@ kafka/
 ├── steam_top_games_producer.py         # 熱門遊戲統計 Producer
 ├── steam_game_details_producer.py      # 遊戲詳情 Producer
 │
-├── setup.sh                            # 快速設定腳本
+├── setup.sh                            # 快速設定指令碼
 ├── start_producers.sh                  # 啟動 Producers
 ├── stop_producers.sh                   # 停止 Producers
 │
@@ -203,7 +203,7 @@ CREATE TABLE steam_game_details (
     game_name String,            -- 遊戲名稱
     developers Array(String),    -- 開發商列表
     publishers Array(String),    -- 發行商列表
-    genres Array(String),        -- 遊戲類型列表
+    genres Array(String),        -- 遊戲型別列表
     original_price Float32,      -- 原價 (USD)
     discount_percent UInt8,      -- 折扣百分比
     final_price Float32,         -- 最終價格 (USD)
@@ -257,7 +257,7 @@ LIMIT 20;
 
 **測試環境**: MacBook Pro M1, 16GB RAM
 
-| 查詢類型 | 資料範圍 | 平均響應時間 |
+| 查詢型別 | 資料範圍 | 平均響應時間 |
 |---------|---------|------------|
 | 最新排行榜 | 100 筆 | <10 ms |
 | 24 小時趨勢 | 144 筆 | <20 ms |
@@ -272,7 +272,7 @@ LIMIT 20;
 **Producer 健康度**
 - 抓取成功率 > 95%
 - API 回應時間 < 5 秒
-- Kafka 發送成功率 = 100%
+- Kafka 傳送成功率 = 100%
 
 **Kafka 健康度**
 - Topic Lag < 100 messages
@@ -291,9 +291,9 @@ LIMIT 20;
 2. 資料更新延遲 > 30 分鐘
 3. ClickHouse 查詢失敗率 > 1%
 
-## 擴展方向
+## 擴充套件方向
 
-### 短期擴展 (1-2 週)
+### 短期擴充套件 (1-2 週)
 
 1. **增加資料維度**
    - 遊戲成就完成度統計
@@ -301,16 +301,16 @@ LIMIT 20;
    - 遊戲社群討論熱度
 
 2. **改善視覺化**
-   - 遊戲類型趨勢分析
+   - 遊戲型別趨勢分析
    - 價格歷史追蹤
    - 折扣預測模型
 
-3. **效能優化**
-   - 實作 Producer 非同步發送
+3. **效能最佳化**
+   - 實作 Producer 非同步傳送
    - 增加 ClickHouse Kafka Consumers
    - 建立 ClickHouse Skipping Index
 
-### 中期擴展 (1-2 月)
+### 中期擴充套件 (1-2 月)
 
 1. **機器學習應用**
    - 玩家數預測模型
@@ -326,9 +326,9 @@ LIMIT 20;
    - 折扣提醒通知
    - 玩家社群分析
 
-### 長期擴展 (3-6 月)
+### 長期擴充套件 (3-6 月)
 
-1. **多平台整合**
+1. **多平臺整合**
    - Epic Games Store
    - GOG
    - PlayStation Store
@@ -342,13 +342,13 @@ LIMIT 20;
 3. **雲端部署**
    - Kubernetes 容器編排
    - 多區域部署
-   - 自動擴展
+   - 自動擴充套件
 
 ## 學習價值
 
 這個專案適合以下學習目標：
 
-### 數據工程
+### 資料工程
 - Kafka 訊息佇列設計
 - ClickHouse 時序資料庫應用
 - 資料管線架構設計
@@ -363,29 +363,29 @@ LIMIT 20;
 ### DevOps
 - Docker 容器化
 - Docker Compose 編排
-- Shell 腳本自動化
+- Shell 指令碼自動化
 - 服務監控與告警
 
 ### 資料視覺化
 - Grafana Dashboard 設計
-- SQL 查詢優化
+- SQL 查詢最佳化
 - 時序圖表設計
-- 互動式儀表板
+- 互動式儀錶板
 
 ## 常見應用場景
 
 1. **遊戲玩家**: 追蹤喜愛遊戲的熱度變化
 2. **遊戲開發者**: 分析競品遊戲的表現
-3. **遊戲評論者**: 獲取遊戲統計數據
-4. **數據分析師**: 學習即時數據管線技術
+3. **遊戲評論者**: 獲取遊戲統計資料
+4. **資料分析師**: 學習即時資料管線技術
 5. **投資者**: 分析遊戲市場趨勢
 
 ## 總結
 
-這是一個完整的生產級數據管線 POC 專案，展示了如何：
-- 設計可擴展的微服務架構
+這是一個完整的生產級資料管線 POC 專案，展示瞭如何：
+- 設計可擴充套件的微服務架構
 - 實作即時資料流處理
 - 建立高效能時序資料庫
-- 建立互動式視覺化儀表板
+- 建立互動式視覺化儀錶板
 
-專案程式碼完整、文件齊全、易於部署，適合作為學習和參考範例。
+專案程式碼完整、檔案齊全、易於部署，適合作為學習和參考範例。

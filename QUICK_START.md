@@ -3,13 +3,13 @@
 ## 一鍵啟動（推薦）
 
 ```bash
-# 1. 執行自動設定腳本
+# 1. 執行自動設定指令碼
 ./setup.sh
 
 # 2. 啟動 Producers
 ./start_producers.sh
 
-# 3. 查看日誌
+# 3. 檢視日誌
 tail -f logs/top_games.log
 ```
 
@@ -19,7 +19,7 @@ tail -f logs/top_games.log
 
 ## 驗證資料流
 
-### 1. 查看 Kafka 訊息
+### 1. 檢視 Kafka 訊息
 
 ```bash
 docker exec kafka kafka-console-consumer \
@@ -29,14 +29,14 @@ docker exec kafka kafka-console-consumer \
   --max-messages 5
 ```
 
-### 2. 查看 ClickHouse 資料
+### 2. 檢視 ClickHouse 資料
 
 ```bash
 # 等待 1-2 分鐘後執行
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT count() FROM steam_top_games"
 
-# 查看最新資料
+# 檢視最新資料
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT * FROM steam_top_games ORDER BY fetch_time DESC LIMIT 10 FORMAT Pretty"
 ```
@@ -68,7 +68,7 @@ docker-compose restart
 docker-compose down
 ```
 
-### 查看日誌
+### 檢視日誌
 
 ```bash
 # Producer 日誌
@@ -116,7 +116,7 @@ docker ps | grep kafka
 # 重啟 Kafka
 docker-compose restart kafka
 
-# 查看 Kafka 日誌
+# 檢視 Kafka 日誌
 docker logs kafka
 ```
 
@@ -156,5 +156,5 @@ docker exec kafka kafka-consumer-groups --describe \
 
 ---
 
-**專案作者**: 資深數據工程師
-**專案目標**: 學習 Kafka + ClickHouse 數據管線
+**專案作者**: 資深資料工程師
+**專案目標**: 學習 Kafka + ClickHouse 資料管線

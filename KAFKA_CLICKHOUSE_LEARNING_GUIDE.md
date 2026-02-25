@@ -78,8 +78,8 @@
 
 ### 什麼是 Apache Kafka？
 
-Apache Kafka 是一個**分散式串流平台**，用於：
-- ✅ 發布與訂閱訊息流（類似消息佇列）
+Apache Kafka 是一個**分散式串流平臺**，用於：
+- ✅ 發布與訂閱訊息流（類似訊息佇列）
 - ✅ 容錯式儲存訊息流
 - ✅ 即時處理訊息流
 
@@ -103,15 +103,15 @@ kafka-topics --create \
   --replication-factor 1
 ```
 
-#### 2. Partition（分區）
+#### 2. Partition（分割槽）
 
-- **定義**: Topic 的子分區，用於平行處理
+- **定義**: Topic 的子分割槽，用於平行處理
 - **作用**:
   - 提高吞吐量（多個 Partition 可平行讀寫）
   - 訊息順序保證（同一 Partition 內保證順序）
   - 負載平衡（訊息分散到不同 Partition）
 
-**分區策略**:
+**分割槽策略**:
 ```python
 # Python Producer 範例
 producer.send(
@@ -123,7 +123,7 @@ producer.send(
 
 #### 3. Producer（生產者）
 
-- **定義**: 發送訊息到 Kafka 的應用程式
+- **定義**: 傳送訊息到 Kafka 的應用程式
 - **本專案範例**: `steam_top_games_producer.py`
 
 **核心程式碼**:
@@ -140,7 +140,7 @@ producer = KafkaProducer(
     max_in_flight_requests_per_connection=1  # 保證順序
 )
 
-# 發送訊息
+# 傳送訊息
 future = producer.send('steam_top_games_topic', value=data)
 record_metadata = future.get(timeout=10)  # 同步等待結果
 
@@ -148,9 +148,9 @@ record_metadata = future.get(timeout=10)  # 同步等待結果
 producer.close()
 ```
 
-**重要參數解析**:
+**重要引數解析**:
 
-| 參數 | 說明 | 推薦值 |
+| 引數 | 說明 | 推薦值 |
 |------|------|--------|
 | `bootstrap_servers` | Kafka 伺服器位址 | `['localhost:9092']` |
 | `acks` | 寫入確認機制 | `'all'` (最安全) |
@@ -207,12 +207,12 @@ Topic: steam_top_games_topic (3 Partitions)
 # 1. 列出所有 Topics
 kafka-topics --list --bootstrap-server localhost:9092
 
-# 2. 查看 Topic 詳細資訊
+# 2. 檢視 Topic 詳細資訊
 kafka-topics --describe \
   --topic steam_top_games_topic \
   --bootstrap-server localhost:9092
 
-# 3. 查看 Consumer Group 狀態
+# 3. 檢視 Consumer Group 狀態
 kafka-consumer-groups --describe \
   --group clickhouse_steam_top_games_consumer \
   --bootstrap-server localhost:9092
@@ -223,7 +223,7 @@ kafka-console-consumer \
   --from-beginning \
   --bootstrap-server localhost:9092
 
-# 5. 查看 Partition 的 Offset
+# 5. 檢視 Partition 的 Offset
 kafka-run-class kafka.tools.GetOffsetShell \
   --broker-list localhost:9092 \
   --topic steam_top_games_topic
@@ -249,7 +249,7 @@ ClickHouse 是一個**列式資料庫管理系統 (DBMS)**，專為 **OLAP (分�
 | **列式儲存** | 只讀取需要的欄位 | 查詢快 10-100 倍 |
 | **資料壓縮** | 壓縮比高達 10:1 | 節省 80% 磁碟空間 |
 | **向量化執行** | SIMD 指令集加速 | CPU 使用率高 |
-| **分散式查詢** | 支援叢集部署 | 水平擴展 |
+| **分散式查詢** | 支援叢集部署 | 水平擴充套件 |
 | **即時寫入** | 支援高頻寫入 | 千萬級 QPS |
 
 ### ClickHouse 核心元件
@@ -265,7 +265,7 @@ ClickHouse 的核心概念，決定了資料如何儲存和查詢。
 - **用途**: 持久化儲存、高效查詢
 - **特性**:
   - 資料按 Primary Key 排序
-  - 支援 Partition（分區）
+  - 支援 Partition（分割槽）
   - 支援 TTL（自動過期）
   - 背景自動合併資料
 
@@ -279,16 +279,16 @@ CREATE TABLE steam_top_games (
     rank UInt16,
     fetch_time DateTime
 ) ENGINE = MergeTree()
-PARTITION BY toYYYYMMDD(fetch_time)  -- 按日分區
+PARTITION BY toYYYYMMDD(fetch_time)  -- 按日分割槽
 ORDER BY (game_id, fetch_time)       -- 排序鍵
 TTL fetch_time + INTERVAL 90 DAY;    -- 90 天後自動刪除
 ```
 
-**關鍵參數解析**:
+**關鍵引數解析**:
 
-| 參數 | 說明 | 範例 | 效果 |
+| 引數 | 說明 | 範例 | 效果 |
 |------|------|------|------|
-| `PARTITION BY` | 分區鍵 | `toYYYYMMDD(fetch_time)` | 按日期建立目錄 |
+| `PARTITION BY` | 分割槽鍵 | `toYYYYMMDD(fetch_time)` | 按日期建立目錄 |
 | `ORDER BY` | 排序鍵 | `(game_id, fetch_time)` | 加速查詢 |
 | `PRIMARY KEY` | 主鍵（可選） | `game_id` | 稀疏索引 |
 | `TTL` | 資料保留時間 | `fetch_time + INTERVAL 90 DAY` | 自動清理 |
@@ -319,9 +319,9 @@ SETTINGS
     kafka_num_consumers = 1;
 ```
 
-**Kafka Engine 參數**:
+**Kafka Engine 引數**:
 
-| 參數 | 說明 | 範例 |
+| 引數 | 說明 | 範例 |
 |------|------|------|
 | `kafka_broker_list` | Kafka 位址 | `'localhost:9092'` |
 | `kafka_topic_list` | Topic 名稱 | `'steam_top_games_topic'` |
@@ -336,10 +336,10 @@ SETTINGS
 - `Avro`: 二進位格式
 - `Protobuf`: Protocol Buffers
 
-#### 2. Materialized View（物化視圖）
+#### 2. Materialized View（物化檢視）
 
 - **定義**: 自動將資料從一個表轉換到另一個表
-- **作用**: 連接 Kafka Engine 和 MergeTree 表
+- **作用**: 連線 Kafka Engine 和 MergeTree 表
 
 **建立範例**:
 ```sql
@@ -378,9 +378,9 @@ Kafka → kafka_steam_top_games (Kafka Engine)
 | `Array(T)` | `list` | 陣列 | `genres Array(String)` |
 | `Nullable(T)` | `Optional` | 可空值 | `email Nullable(String)` |
 
-#### 4. SQL 函數
+#### 4. SQL 函式
 
-**時間函數**:
+**時間函式**:
 ```sql
 -- 取得當前時間
 SELECT now();
@@ -395,7 +395,7 @@ SELECT now() - INTERVAL 1 DAY;
 SELECT now() - INTERVAL 6 HOUR;
 ```
 
-**聚合函數**:
+**聚合函式**:
 ```sql
 -- 基本聚合
 SELECT
@@ -414,7 +414,7 @@ SELECT argMax(game_name, current_players) FROM steam_top_games;
 SELECT uniq(game_id) FROM steam_top_games;
 ```
 
-**陣列函數**:
+**陣列函式**:
 ```sql
 -- arrayJoin: 將陣列展開為多行
 SELECT arrayJoin(['Action', 'RPG', 'Strategy']) as genre;
@@ -476,7 +476,7 @@ json_string = json.dumps(data)
 # 編碼為 bytes
 bytes_data = json_string.encode('utf-8')
 
-# 發送到 Kafka
+# 傳送到 Kafka
 producer.send('steam_top_games_topic', value=bytes_data)
 ```
 
@@ -492,7 +492,7 @@ producer.send('steam_top_games_topic', value=bytes_data)
 
 ### Consumer Offset 管理
 
-**查看 Offset**:
+**檢視 Offset**:
 ```bash
 # 在 Kafka 容器中執行
 kafka-consumer-groups --describe \
@@ -632,7 +632,7 @@ producer = KafkaProducer(
 response = requests.get('https://api.example.com/games', timeout=30)
 games_data = response.json()
 
-# 3. 處理並發送到 Kafka
+# 3. 處理並傳送到 Kafka
 for game in games_data:
     # 格式化資料（必須符合 ClickHouse 表結構）
     record = {
@@ -644,15 +644,15 @@ for game in games_data:
         'fetch_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
 
-    # 發送到 Kafka
+    # 傳送到 Kafka
     try:
         future = producer.send('steam_top_games_topic', value=record)
         record_metadata = future.get(timeout=10)
-        print(f"✓ 發送成功: {record['game_name']}")
+        print(f"✓ 傳送成功: {record['game_name']}")
     except KafkaError as e:
-        print(f"✗ 發送失敗: {e}")
+        print(f"✗ 傳送失敗: {e}")
 
-# 4. 確保所有訊息都已發送
+# 4. 確保所有訊息都已傳送
 producer.flush()
 producer.close()
 ```
@@ -744,7 +744,7 @@ docker exec kafka kafka-topics --create \
 docker exec kafka kafka-topics --list \
   --bootstrap-server localhost:9092
 
-# 查看 Topic 詳細資訊
+# 檢視 Topic 詳細資訊
 docker exec kafka kafka-topics --describe \
   --topic steam_top_games_topic \
   --bootstrap-server localhost:9092
@@ -758,7 +758,7 @@ docker exec kafka kafka-topics --delete \
 # 訊息管理
 # ============================================
 
-# 手動發送訊息（測試用）
+# 手動傳送訊息（測試用）
 docker exec -it kafka kafka-console-producer \
   --topic steam_top_games_topic \
   --bootstrap-server localhost:9092
@@ -783,7 +783,7 @@ docker exec kafka kafka-console-consumer \
 docker exec kafka kafka-consumer-groups --list \
   --bootstrap-server localhost:9092
 
-# 查看 Consumer Group 詳情
+# 檢視 Consumer Group 詳情
 docker exec kafka kafka-consumer-groups --describe \
   --group clickhouse_steam_top_games_consumer \
   --bootstrap-server localhost:9092
@@ -803,7 +803,7 @@ docker exec kafka kafka-consumer-groups --reset-offsets \
 # 基本查詢
 # ============================================
 
-# 連接 ClickHouse Client
+# 連線 ClickHouse Client
 docker exec -it clickhouse-server clickhouse-client
 
 # 或直接執行 SQL
@@ -820,15 +820,15 @@ EOF
 # 表管理
 # ============================================
 
-# 查看表結構
+# 檢視錶結構
 docker exec clickhouse-server clickhouse-client --query \
   "DESCRIBE TABLE steam_top_games"
 
-# 查看建表語句
+# 檢視建表語句
 docker exec clickhouse-server clickhouse-client --query \
   "SHOW CREATE TABLE steam_top_games"
 
-# 查看表大小
+# 檢視錶大小
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT
      table,
@@ -846,7 +846,7 @@ docker exec clickhouse-server clickhouse-client --query \
 # Partition 管理
 # ============================================
 
-# 查看 Partitions
+# 檢視 Partitions
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT
      partition,
@@ -865,11 +865,11 @@ docker exec clickhouse-server clickhouse-client --query \
 # Kafka Engine 偵錯
 # ============================================
 
-# 查看 Kafka Engine 狀態
+# 檢視 Kafka Engine 狀態
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT * FROM system.kafka_consumers"
 
-# 查看錯誤日誌
+# 檢視錯誤日誌
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT * FROM system.text_log
    WHERE logger_name LIKE '%Kafka%'
@@ -903,7 +903,7 @@ docker exec clickhouse-server clickhouse-client --query \
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT count() FROM steam_top_games"
 
-# 4. 查看最新資料
+# 4. 檢視最新資料
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT * FROM steam_top_games
    ORDER BY fetch_time DESC
@@ -952,15 +952,15 @@ producer = KafkaProducer(
 )
 ```
 
-#### 2. 分區策略
+#### 2. 分割槽策略
 ```python
 from kafka.partitioner import Murmur2Partitioner
 
 producer = KafkaProducer(
-    partitioner=Murmur2Partitioner(),  # 自訂分區器
+    partitioner=Murmur2Partitioner(),  # 自訂分割槽器
 )
 
-# 自訂分區邏輯
+# 自訂分割槽邏輯
 def custom_partitioner(key, all_partitions, available_partitions):
     return hash(key) % len(all_partitions)
 ```
@@ -991,9 +991,9 @@ CREATE TABLE steam_top_games_distributed AS steam_top_games
 ENGINE = Distributed(cluster_name, default, steam_top_games, rand());
 ```
 
-#### 2. 物化視圖進階用法
+#### 2. 物化檢視進階用法
 ```sql
--- 聚合物化視圖（預先計算）
+-- 聚合物化檢視（預先計算）
 CREATE MATERIALIZED VIEW steam_hourly_stats
 ENGINE = SummingMergeTree()
 PARTITION BY toYYYYMMDD(hour)
@@ -1007,7 +1007,7 @@ FROM steam_top_games
 GROUP BY hour, game_id;
 ```
 
-#### 3. 索引優化
+#### 3. 索引最佳化
 ```sql
 -- Skipping Index（跳過索引）
 ALTER TABLE steam_top_games
@@ -1020,7 +1020,7 @@ WHERE game_name = 'Counter-Strike 2';
 
 ### 學習資源
 
-**官方文件**:
+**官方檔案**:
 - Apache Kafka: https://kafka.apache.org/documentation/
 - ClickHouse: https://clickhouse.com/docs/
 - kafka-python: https://kafka-python.readthedocs.io/
@@ -1034,7 +1034,7 @@ WHERE game_name = 'Counter-Strike 2';
 - ClickHouse 官方 Webinar
 
 **實戰練習**:
-1. 擴展本專案，增加更多資料來源
+1. 擴充套件本專案，增加更多資料來源
 2. 實作 Kafka 叢集（3 個 Broker）
 3. 實作 ClickHouse 叢集（Shard + Replica）
 4. 使用 Kafka Connect 整合其他系統
@@ -1051,9 +1051,9 @@ WHERE game_name = 'Counter-Strike 2';
 ✅ **資料管線**: API → Kafka → ClickHouse → Grafana
 ✅ **實戰技能**: Docker 容器化、Python 開發、SQL 查詢
 
-透過本專案，你已經掌握了現代數據工程的核心技術棧！
+透過本專案，你已經掌握了現代資料工程的核心技術棧！
 
 ---
 
-**專案作者**: 資深數據工程師
+**專案作者**: 資深資料工程師
 **最後更新**: 2024-02-24

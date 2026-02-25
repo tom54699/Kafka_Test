@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Steam 熱門遊戲玩家統計 Producer
-功能：定期抓取 Steam 熱門遊戲的即時玩家數，並發送到 Kafka
+功能：定期抓取 Steam 熱門遊戲的即時玩家數，並傳送到 Kafka
 資料來源：Steam Charts API + Steam Web API
 """
 
@@ -55,7 +55,7 @@ def create_kafka_producer(max_retries=5) -> Optional[KafkaProducer]:
             if attempt < max_retries - 1:
                 time.sleep(5)
             else:
-                logger.critical("無法連接到 Kafka，程式終止")
+                logger.critical("無法連線到 Kafka，程式終止")
                 return None
     return None
 
@@ -199,33 +199,33 @@ def process_game_data(games_data: Dict[str, Dict[str, Any]]) -> List[Dict]:
     logger.info(f"完成處理，共 {len(processed_games)} 筆記錄")
     return processed_games
 
-# ================== 發送到 Kafka ==================
+# ================== 傳送到 Kafka ==================
 def send_to_kafka(producer: KafkaProducer, data: List[Dict]) -> int:
     """
-    批次發送資料到 Kafka
-    回傳成功發送的筆數
+    批次傳送資料到 Kafka
+    回傳成功傳送的筆數
     """
     success_count = 0
 
     for record in data:
         try:
             future = producer.send(KAFKA_TOPIC, value=record)
-            # 等待發送結果（同步模式）
+            # 等待傳送結果（同步模式）
             record_metadata = future.get(timeout=10)
             success_count += 1
 
             # 每 20 筆顯示一次進度
             if success_count % 20 == 0:
-                logger.info(f"已發送 {success_count}/{len(data)} 筆資料到 Kafka")
+                logger.info(f"已傳送 {success_count}/{len(data)} 筆資料到 Kafka")
 
         except KafkaError as e:
-            logger.error(f"發送失敗 - 遊戲: {record.get('game_name')}, 錯誤: {e}")
+            logger.error(f"傳送失敗 - 遊戲: {record.get('game_name')}, 錯誤: {e}")
         except Exception as e:
-            logger.error(f"發送時發生未預期錯誤: {e}")
+            logger.error(f"傳送時發生未預期錯誤: {e}")
 
-    # 確保所有訊息都已發送
+    # 確保所有訊息都已傳送
     producer.flush()
-    logger.info(f"批次發送完成，成功 {success_count}/{len(data)} 筆")
+    logger.info(f"批次傳送完成，成功 {success_count}/{len(data)} 筆")
 
     return success_count
 
@@ -244,14 +244,14 @@ def main():
         while True:
             iteration += 1
             logger.info(f"\n{'='*60}")
-            logger.info(f"第 {iteration} 次資料抓取與發送")
+            logger.info(f"第 {iteration} 次資料抓取與傳送")
             logger.info(f"{'='*60}")
 
             # 1. 抓取熱門遊戲列表
             games_data = fetch_top_games()
 
             if not games_data:
-                logger.warning("未抓取到任何遊戲資料，跳過此次循環")
+                logger.warning("未抓取到任何遊戲資料，跳過此次迴圈")
                 time.sleep(FETCH_INTERVAL)
                 continue
 
@@ -259,21 +259,21 @@ def main():
             processed_data = process_game_data(games_data)
 
             if not processed_data:
-                logger.warning("資料處理後無有效記錄，跳過此次循環")
+                logger.warning("資料處理後無有效記錄，跳過此次迴圈")
                 time.sleep(FETCH_INTERVAL)
                 continue
 
-            # 3. 發送到 Kafka
+            # 3. 傳送到 Kafka
             success_count = send_to_kafka(producer, processed_data)
 
-            logger.info(f"本次循環完成，成功發送 {success_count} 筆資料")
+            logger.info(f"本次迴圈完成，成功傳送 {success_count} 筆資料")
             logger.info(f"等待 {FETCH_INTERVAL} 秒後進行下次抓取...\n")
 
             # 休眠等待下次執行
             time.sleep(FETCH_INTERVAL)
 
     except KeyboardInterrupt:
-        logger.info("\n收到中斷信號，正在關閉...")
+        logger.info("\n收到中斷訊號，正在關閉...")
     except Exception as e:
         logger.critical(f"程式發生嚴重錯誤: {e}")
     finally:

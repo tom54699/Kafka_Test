@@ -1,5 +1,5 @@
 #!/bin/bash
-# 重建 ClickHouse Kafka Engine 表以应用新配置
+# 重建 ClickHouse Kafka Engine 表以應用新配置
 
 set -e
 
@@ -7,23 +7,23 @@ echo "==========================================="
 echo "重建 ClickHouse Kafka Engine 表"
 echo "==========================================="
 
-# 删除旧的 Materialized Views 和 Kafka Engine 表
-echo "1. 删除旧的 Materialized Views..."
+# 刪除舊的 Materialized Views 和 Kafka Engine 表
+echo "1. 刪除舊的 Materialized Views..."
 docker exec clickhouse-server clickhouse-client --query "DROP VIEW IF EXISTS steam_top_games_mv"
 docker exec clickhouse-server clickhouse-client --query "DROP VIEW IF EXISTS steam_game_details_mv"
-echo "✓ Materialized Views 已删除"
+echo "✓ Materialized Views 已刪除"
 
 echo ""
-echo "2. 删除旧的 Kafka Engine 表..."
+echo "2. 刪除舊的 Kafka Engine 表..."
 docker exec clickhouse-server clickhouse-client --query "DROP TABLE IF EXISTS kafka_steam_top_games"
 docker exec clickhouse-server clickhouse-client --query "DROP TABLE IF EXISTS kafka_steam_game_details"
-echo "✓ Kafka Engine 表已删除"
+echo "✓ Kafka Engine 表已刪除"
 
-# 重新创建（保留 MergeTree 表，数据不会丢失）
+# 重新建立（保留 MergeTree 表，資料不會丟失）
 echo ""
-echo "3. 重新创建 Kafka Engine 表和 Materialized Views..."
+echo "3. 重新建立 Kafka Engine 表和 Materialized Views..."
 
-# 创建 steam_top_games 的 Kafka Engine 表
+# 建立 steam_top_games 的 Kafka Engine 表
 docker exec clickhouse-server clickhouse-client --query "
 CREATE TABLE kafka_steam_top_games (
     game_id UInt32,
@@ -44,7 +44,7 @@ SETTINGS
     kafka_max_block_size = 100
 "
 
-# 创建 steam_top_games 的 Materialized View
+# 建立 steam_top_games 的 Materialized View
 docker exec clickhouse-server clickhouse-client --query "
 CREATE MATERIALIZED VIEW steam_top_games_mv TO steam_top_games AS
 SELECT
@@ -57,7 +57,7 @@ SELECT
 FROM kafka_steam_top_games
 "
 
-# 创建 steam_game_details 的 Kafka Engine 表
+# 建立 steam_game_details 的 Kafka Engine 表
 docker exec clickhouse-server clickhouse-client --query "
 CREATE TABLE kafka_steam_game_details (
     game_id UInt32,
@@ -87,7 +87,7 @@ SETTINGS
     kafka_max_block_size = 100
 "
 
-# 创建 steam_game_details 的 Materialized View
+# 建立 steam_game_details 的 Materialized View
 docker exec clickhouse-server clickhouse-client --query "
 CREATE MATERIALIZED VIEW steam_game_details_mv TO steam_game_details AS
 SELECT
@@ -109,24 +109,24 @@ SELECT
 FROM kafka_steam_game_details
 "
 
-echo "✓ Kafka Engine 表和 Materialized Views 已重新创建"
+echo "✓ Kafka Engine 表和 Materialized Views 已重新建立"
 
-# 验证
+# 驗證
 echo ""
-echo "4. 验证配置..."
+echo "4. 驗證配置..."
 docker exec clickhouse-server clickhouse-client --query "SHOW TABLES"
 
 echo ""
 echo "==========================================="
-echo "✓ 完成！新配置已应用"
+echo "✓ 完成！新配置已應用"
 echo "==========================================="
 echo ""
-echo "优化说明："
-echo "  - kafka_num_consumers: 1 → 3 (增加并行消费者)"
-echo "  - kafka_flush_interval_ms: 7500 → 1000 (加快写入速度)"
-echo "  - kafka_poll_timeout_ms: 默认 → 1000 (减少轮询等待)"
-echo "  - kafka_max_block_size: 默认 → 100 (适合小批量实时写入)"
+echo "最佳化說明："
+echo "  - kafka_num_consumers: 1 → 3 (增加並行消費者)"
+echo "  - kafka_flush_interval_ms: 7500 → 1000 (加快寫入速度)"
+echo "  - kafka_poll_timeout_ms: 預設 → 1000 (減少輪詢等待)"
+echo "  - kafka_max_block_size: 預設 → 100 (適合小批次即時寫入)"
 echo ""
-echo "注意：使用了新的 consumer group (_v2)，会从最新的 offset 开始消费"
-echo "如需从头消费，请重置 Kafka consumer group offset"
+echo "注意：使用了新的 consumer group (_v2)，會從最新的 offset 開始消費"
+echo "如需從頭消費，請重置 Kafka consumer group offset"
 echo ""

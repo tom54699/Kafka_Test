@@ -1,10 +1,10 @@
 #!/bin/bash
-# Steam 數據管線專案快速設定腳本
+# Steam 資料管線專案快速設定指令碼
 
 set -e
 
 echo "==========================================="
-echo "Steam 數據管線專案快速設定"
+echo "Steam 資料管線專案快速設定"
 echo "==========================================="
 
 # 顏色定義
@@ -81,7 +81,7 @@ fi
 echo "等待 ClickHouse 完全啟動..."
 sleep 5
 
-# 執行 SQL 腳本
+# 執行 SQL 指令碼
 cat clickhouse_schema.sql | docker exec -i clickhouse-server clickhouse-client --multiquery
 
 # 驗證資料表
@@ -129,7 +129,7 @@ echo -e "\n${YELLOW}[6/6] 建立日誌目錄...${NC}"
 mkdir -p logs
 echo -e "${GREEN}✓ 日誌目錄已建立${NC}"
 
-# 設定腳本執行權限
+# 設定指令碼執行許可權
 chmod +x start_producers.sh
 chmod +x stop_producers.sh
 
@@ -151,7 +151,7 @@ echo ""
 echo "  2. 停止 Producers:"
 echo "     ./stop_producers.sh"
 echo ""
-echo "  3. 查看日誌:"
+echo "  3. 檢視日誌:"
 echo "     tail -f logs/top_games.log"
 echo "     tail -f logs/game_details.log"
 echo ""

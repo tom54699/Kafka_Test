@@ -40,7 +40,7 @@ nano .env
 1. 訪問 Steam ID 查詢工具：
    https://steamid.io/
 
-2. 輸入你的 Steam Profile URL 或用戶名稱
+2. 輸入你的 Steam Profile URL 或使用者名稱稱
 
 3. 複製 **steamID64** 欄位的數字
    範例：`76561198138286305`
@@ -124,7 +124,7 @@ python example_env_usage.py
 | 變數名稱 | 說明 | 必填 | 預設值 |
 |---------|------|------|--------|
 | `STEAM_API_KEY` | Steam Web API Key | ✅ | - |
-| `STEAM_ID` | Steam 用戶 ID (SteamID64) | ❌ | - |
+| `STEAM_ID` | Steam 使用者 ID (SteamID64) | ❌ | - |
 
 ### Kafka 相關
 
@@ -174,12 +174,12 @@ python example_env_usage.py
 
 1. **不要分享**: 不要將 API Key 分享給他人
 2. **定期更換**: 定期重新產生新的 API Key
-3. **限制權限**: 在 Steam API 設定中限制 Domain
-4. **撤銷舊的 Key**: 如果 Key 洩漏，立即到 Steam 後台撤銷
+3. **限制許可權**: 在 Steam API 設定中限制 Domain
+4. **撤銷舊的 Key**: 如果 Key 洩漏，立即到 Steam 後臺撤銷
 
 **撤銷 API Key**:
 1. 訪問 https://steamcommunity.com/dev/apikey
-2. 點擊 "Revoke My Steam Web API Key"
+2. 點選 "Revoke My Steam Web API Key"
 3. 重新產生新的 Key
 
 ## 測試環境變數設定
@@ -337,6 +337,6 @@ url = f"https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?k
 ---
 
 **相關資源**:
-- Steam Web API 文件: https://steamcommunity.com/dev
+- Steam Web API 檔案: https://steamcommunity.com/dev
 - Steam ID 查詢: https://steamid.io/
-- python-dotenv 文件: https://pypi.org/project/python-dotenv/
+- python-dotenv 檔案: https://pypi.org/project/python-dotenv/

@@ -43,3 +43,5 @@ grafana_data/
 .AppleDouble
 .LSOverride
 ._*
+
+.claude

@@ -1,8 +1,8 @@
-# 高頻率數據抓取配置方案
+# 高頻率資料抓取配置方案
 
 ## 方案一：提高更新頻率（學習推薦）
 
-適合本地學習、短期運行（1-2 天），資料量增加 10-20 倍。
+適合本地學習、短期執行（1-2 天），資料量增加 10-20 倍。
 
 ### 修改配置
 
@@ -39,11 +39,11 @@ API_REQUEST_DELAY=1.0             # 從 1.5 秒降到 1 秒
 ### 風險
 - ⚠️ 可能觸發 Steam API Rate Limit
 - ⚠️ CPU 和網路使用率增加
-- ⚠️ 不適合長期運行（建議 1-2 天內測試完畢）
+- ⚠️ 不適合長期執行（建議 1-2 天內測試完畢）
 
 ---
 
-## 方案二：模擬高頻數據（零風險）
+## 方案二：模擬高頻資料（零風險）
 
 不依賴真實 API，用模擬資料產生大量訊息。
 
@@ -52,7 +52,7 @@ API_REQUEST_DELAY=1.0             # 從 1.5 秒降到 1 秒
 ```python
 #!/usr/bin/env python3
 """
-steam_mock_producer.py - 模擬高頻數據 Producer
+steam_mock_producer.py - 模擬高頻資料 Producer
 用途：產生大量模擬資料，學習 Kafka 高吞吐能力
 """
 
@@ -113,7 +113,7 @@ def main():
             producer.send('steam_top_games_topic', value=record)
 
         producer.flush()
-        print(f"✓ 第 {iteration} 次發送完成，已發送 {len(mock_data)} 筆資料")
+        print(f"✓ 第 {iteration} 次傳送完成，已傳送 {len(mock_data)} 筆資料")
 
         time.sleep(5)  # 每 5 秒執行一次
 
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     real_thread.start()
     mock_thread.start()
 
-    # 保持主程式運行
+    # 保持主程式執行
     try:
         while True:
             time.sleep(1)
@@ -210,7 +210,7 @@ if __name__ == "__main__":
 
 ## 方案四：追蹤所有遊戲（極限方案）
 
-Steam 平台有超過 70,000 款遊戲，追蹤全部！
+Steam 平臺有超過 70,000 款遊戲，追蹤全部！
 
 ### 修改配置
 
@@ -241,7 +241,7 @@ BATCH_INTERVAL=60                 # 每分鐘處理一批
 | 方案 | 資料量倍數 | API 風險 | 適合場景 |
 |------|-----------|---------|---------|
 | **方案一：高頻率** | 20x | ⚠️ 中等 | 短期學習（1-2 天） |
-| **方案二：模擬數據** | 100x | ✅ 無 | **學習 Kafka 推薦** |
+| **方案二：模擬資料** | 100x | ✅ 無 | **學習 Kafka 推薦** |
 | **方案三：混合** | 100x | ⚠️ 低 | **最佳平衡** |
 | **方案四：全量追蹤** | 8x | ❌ 高 | 生產環境（需多 Key） |
 
@@ -267,7 +267,7 @@ nano .env
 tail -f logs/top_games.log
 ```
 
-### 方案二：模擬數據（推薦）
+### 方案二：模擬資料（推薦）
 
 已為你建立 `steam_mock_producer.py`，立即執行：
 
@@ -275,12 +275,12 @@ tail -f logs/top_games.log
 # 1. 啟動模擬 Producer
 python steam_mock_producer.py
 
-# 2. 另開終端查看 Kafka
+# 2. 另開終端檢視 Kafka
 docker exec kafka kafka-console-consumer \
   --topic steam_top_games_topic \
   --bootstrap-server localhost:9092
 
-# 3. 查看 ClickHouse 資料量
+# 3. 檢視 ClickHouse 資料量
 docker exec clickhouse-server clickhouse-client --query \
   "SELECT count() FROM steam_top_games"
 ```
@@ -292,12 +292,12 @@ docker exec clickhouse-server clickhouse-client --query \
 ### Kafka 吞吐量
 
 ```bash
-# 查看 Topic 訊息數
+# 檢視 Topic 訊息數
 docker exec kafka kafka-run-class kafka.tools.GetOffsetShell \
   --broker-list localhost:9092 \
   --topic steam_top_games_topic
 
-# 查看 Consumer Lag
+# 檢視 Consumer Lag
 docker exec kafka kafka-consumer-groups --describe \
   --group clickhouse_steam_top_games_consumer \
   --bootstrap-server localhost:9092
@@ -306,7 +306,7 @@ docker exec kafka kafka-consumer-groups --describe \
 ### ClickHouse 寫入速度
 
 ```sql
--- 查看每分鐘寫入筆數
+-- 檢視每分鐘寫入筆數
 SELECT
     toStartOfMinute(fetch_time) as minute,
     count() as records
@@ -322,7 +322,7 @@ ORDER BY minute DESC;
 
 對於**學習 Kafka + ClickHouse**：
 
-1. **第一天**: 使用**方案二（模擬數據）**
+1. **第一天**: 使用**方案二（模擬資料）**
    - 產生大量資料，體驗高吞吐
    - 測試 ClickHouse 查詢效能
    - 學習 Kafka 的平行處理
@@ -335,6 +335,6 @@ ORDER BY minute DESC;
 3. **第三天**: 使用**方案一（高頻率）**
    - 測試真實 API 的限制
    - 學習錯誤處理和重試機制
-   - 了解 Rate Limit 的影響
+   - 瞭解 Rate Limit 的影響
 
-這樣你可以在**3 天內完整體驗**從模擬到真實的完整數據管線！
+這樣你可以在**3 天內完整體驗**從模擬到真實的完整資料管線！

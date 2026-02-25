@@ -23,12 +23,12 @@ CLICKHOUSE_SKIP_USER_SETUP=1
 
 ## 步驟 2: 進入 Data Sources 頁面
 
-1. 點擊左側選單的 **齒輪圖示⚙️ (Configuration)**
-   - 或點擊左側選單 **三條線☰** → **Connections**
+1. 點選左側選單的 **齒輪圖示⚙️ (Configuration)**
+   - 或點選左側選單 **三條線☰** → **Connections**
 
-2. 點擊 **Data sources**
+2. 點選 **Data sources**
 
-3. 點擊右上角藍色按鈕 **Add data source**
+3. 點選右上角藍色按鈕 **Add data source**
 
 ---
 
@@ -38,7 +38,7 @@ CLICKHOUSE_SKIP_USER_SETUP=1
 
 2. 應該會看到 **ClickHouse** 卡片（圖示是綠色的資料庫圖案）
 
-3. 點擊 **ClickHouse**
+3. 點選 **ClickHouse**
 
 ---
 
@@ -111,7 +111,7 @@ ClickHouse
 
 1. 滾動到頁面**最底部**
 
-2. 點擊藍色按鈕：**Save & test**
+2. 點選藍色按鈕：**Save & test**
 
 3. 等待 2-3 秒
 
@@ -146,14 +146,14 @@ ClickHouse
 
 ### 錯誤訊息 3: "connection refused"
 
-**可能原因**：ClickHouse 未運行
+**可能原因**：ClickHouse 未執行
 
 **解決方法**：
 ```bash
 # 檢查 ClickHouse 狀態
 docker ps | grep clickhouse
 
-# 如果沒運行，重啟它
+# 如果沒執行，重啟它
 docker-compose restart clickhouse
 ```
 
@@ -201,7 +201,7 @@ docker-compose restart clickhouse
 
 ### 驗證連線
 
-1. 點擊左側選單 **Explore**（放大鏡圖示🔍）
+1. 點選左側選單 **Explore**（放大鏡圖示🔍）
 
 2. 上方選擇 Data source：**ClickHouse**
 
@@ -210,7 +210,7 @@ docker-compose restart clickhouse
    SELECT 1
    ```
 
-4. 點擊右上角 **Run query**
+4. 點選右上角 **Run query**
 
 5. 應該會看到結果：`1`
 
@@ -253,10 +253,10 @@ docker ps | grep clickhouse
 # 2. 測試 ClickHouse 連線
 docker exec clickhouse-server clickhouse-client --query "SELECT 1"
 
-# 3. 從 Grafana 容器測試連接
+# 3. 從 Grafana 容器測試連線
 docker exec grafana wget -O- http://clickhouse:8123/
 
-# 4. 查看 Grafana 日誌
+# 4. 檢視 Grafana 日誌
 docker logs grafana 2>&1 | tail -30
 ```
 
@@ -271,4 +271,4 @@ docker logs grafana 2>&1 | tail -30
 - ✅ Password **完全留空**
 - ✅ 其他欄位全部留空
 
-按照這個步驟，應該就能成功連接了！
+按照這個步驟，應該就能成功連線了！

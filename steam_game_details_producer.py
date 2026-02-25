@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Steam 遊戲詳細資訊 Producer
-功能：定期抓取 Steam 遊戲的詳細資訊（價格、評價、開發商等），並發送到 Kafka
+功能：定期抓取 Steam 遊戲的詳細資訊（價格、評價、開發商等），並傳送到 Kafka
 資料來源：Steam Store API
 """
 
@@ -54,11 +54,11 @@ def create_kafka_producer(max_retries=5) -> Optional[KafkaProducer]:
             if attempt < max_retries - 1:
                 time.sleep(5)
             else:
-                logger.critical("無法連接到 Kafka，程式終止")
+                logger.critical("無法連線到 Kafka，程式終止")
                 return None
     return None
 
-# ================== 資料抓取函數 ==================
+# ================== 資料抓取函式 ==================
 def fetch_top_game_ids(top_n=100) -> List[int]:
     """
     從 Steam 官方 API 抓取熱門遊戲的 AppID 列表
@@ -129,7 +129,7 @@ def fetch_game_details(app_id: int) -> Optional[Dict]:
     try:
         params = {
             'appids': app_id,
-            'cc': 'tw',  # 台灣區域
+            'cc': 'tw',  # 臺灣區域
             'l': 'tchinese'  # 繁體中文
         }
 
@@ -195,7 +195,7 @@ def process_game_details(app_id: int, game_data: Dict) -> Optional[Dict]:
         negative_reviews = total_reviews - positive_reviews
         review_score = (positive_reviews / total_reviews * 100) if total_reviews > 0 else 0.0
 
-        # 處理類型資訊
+        # 處理型別資訊
         genres = [g.get('description', '') for g in game_data.get('genres', [])]
 
         # 處理開發商和發行商
@@ -226,20 +226,20 @@ def process_game_details(app_id: int, game_data: Dict) -> Optional[Dict]:
         logger.error(f"處理遊戲 {app_id} 的資料時發生錯誤: {e}")
         return None
 
-# ================== 發送到 Kafka ==================
+# ================== 傳送到 Kafka ==================
 def send_to_kafka(producer: KafkaProducer, record: Dict) -> bool:
     """
-    發送單筆資料到 Kafka
+    傳送單筆資料到 Kafka
     """
     try:
         future = producer.send(KAFKA_TOPIC, value=record)
         future.get(timeout=10)
         return True
     except KafkaError as e:
-        logger.error(f"發送失敗 - 遊戲: {record.get('game_name')}, 錯誤: {e}")
+        logger.error(f"傳送失敗 - 遊戲: {record.get('game_name')}, 錯誤: {e}")
         return False
     except Exception as e:
-        logger.error(f"發送時發生未預期錯誤: {e}")
+        logger.error(f"傳送時發生未預期錯誤: {e}")
         return False
 
 # ================== 主程式 ==================
@@ -257,18 +257,18 @@ def main():
         while True:
             iteration += 1
             logger.info(f"\n{'='*60}")
-            logger.info(f"第 {iteration} 次資料抓取與發送")
+            logger.info(f"第 {iteration} 次資料抓取與傳送")
             logger.info(f"{'='*60}")
 
             # 1. 獲取熱門遊戲的 AppID 列表
             app_ids = fetch_top_game_ids(top_n=100)
 
             if not app_ids:
-                logger.warning("未獲取到任何遊戲 AppID，跳過此次循環")
+                logger.warning("未獲取到任何遊戲 AppID，跳過此次迴圈")
                 time.sleep(FETCH_INTERVAL)
                 continue
 
-            # 2. 逐一抓取遊戲詳細資訊並發送到 Kafka
+            # 2. 逐一抓取遊戲詳細資訊並傳送到 Kafka
             success_count = 0
             failed_count = 0
 
@@ -291,10 +291,10 @@ def main():
                     time.sleep(1.5)
                     continue
 
-                # 發送到 Kafka
+                # 傳送到 Kafka
                 if send_to_kafka(producer, game_record):
                     success_count += 1
-                    logger.info(f"✓ 成功發送: {game_record['game_name']}")
+                    logger.info(f"✓ 成功傳送: {game_record['game_name']}")
                 else:
                     failed_count += 1
 
@@ -306,11 +306,11 @@ def main():
                 if idx % 10 == 0:
                     logger.info(f"進度: {idx}/{len(app_ids)}, 成功: {success_count}, 失敗: {failed_count}")
 
-            # 確保所有訊息都已發送
+            # 確保所有訊息都已傳送
             producer.flush()
 
             logger.info(f"\n{'='*60}")
-            logger.info(f"本次循環完成統計:")
+            logger.info(f"本次迴圈完成統計:")
             logger.info(f"  總數: {len(app_ids)}")
             logger.info(f"  成功: {success_count}")
             logger.info(f"  失敗: {failed_count}")
@@ -322,7 +322,7 @@ def main():
             time.sleep(FETCH_INTERVAL)
 
     except KeyboardInterrupt:
-        logger.info("\n收到中斷信號，正在關閉...")
+        logger.info("\n收到中斷訊號，正在關閉...")
     except Exception as e:
         logger.critical(f"程式發生嚴重錯誤: {e}")
     finally:

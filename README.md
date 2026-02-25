@@ -1,14 +1,14 @@
-# Steam 數據管線 POC 專案
+# Steam 資料管線 POC 專案
 
-本專案是一個基於 Kafka + ClickHouse + Grafana 的即時數據管線系統，用於追蹤和視覺化 Steam 遊戲平台的熱門遊戲統計數據。
+本專案是一個基於 Kafka + ClickHouse + Grafana 的即時資料管線系統，用於追蹤和視覺化 Steam 遊戲平臺的熱門遊戲統計資料。
 
-## 📚 文档导航
+## 📚 文件導航
 
-- [📖 完整文档索引](DOCS_INDEX.md) - 查看所有文档
-- [🚀 快速开始](QUICK_START.md) - 5分钟快速部署
-- [📜 脚本使用指南](SCRIPTS_GUIDE.md) - 所有脚本的详细说明
-- [⚙️ 高频配置](HIGH_FREQUENCY_CONFIG.md) - 压力测试和性能调优
-- [📊 Kafka UI 指南](KAFKA_UI_GUIDE.md) - 监控 Kafka 消息流
+- [📖 完整文件索引](DOCS_INDEX.md) - 檢視所有文件
+- [🚀 快速開始](QUICK_START.md) - 5分鐘快速部署
+- [📜 指令碼使用指南](SCRIPTS_GUIDE.md) - 所有指令碼的詳細說明
+- [⚙️ 高頻配置](HIGH_FREQUENCY_CONFIG.md) - 壓力測試和效能調優
+- [📊 Kafka UI 指南](KAFKA_UI_GUIDE.md) - 監控 Kafka 訊息流
 
 ## 專案架構
 
@@ -31,7 +31,7 @@ Steam API → Python Producers → Kafka Topics → ClickHouse → Grafana Dashb
    - Materialized View: 自動轉換資料
    - MergeTree Table: 長期儲存與查詢
 
-4. **Grafana** - 視覺化儀表板
+4. **Grafana** - 視覺化儀錶板
    - 即時監控熱門遊戲排行
    - 玩家數趨勢分析
    - 折扣遊戲推薦
@@ -50,16 +50,16 @@ Steam API → Python Producers → Kafka Topics → ClickHouse → Grafana Dashb
 
 ## 快速開始
 
-### 🎯 两种启动方式
+### 🎯 兩種啟動方式
 
-#### 方式 1: 一键自动化部署（推荐）
+#### 方式 1: 一鍵自動化部署（推薦）
 ```bash
 ./setup.sh
 ```
-这个脚本会自动完成所有初始化工作（详见 [SCRIPTS_GUIDE.md](SCRIPTS_GUIDE.md)）
+這個指令碼會自動完成所有初始化工作（詳見 [SCRIPTS_GUIDE.md](SCRIPTS_GUIDE.md)）
 
-#### 方式 2: 手动逐步部署
-按照下面的步骤手动执行
+#### 方式 2: 手動逐步部署
+按照下面的步驟手動執行
 
 ---
 
@@ -86,7 +86,7 @@ docker-compose up -d
 
 ### 3. 建立 ClickHouse Schema
 
-執行 SQL 腳本建立資料表和資料管線：
+執行 SQL 指令碼建立資料表和資料管線：
 
 ```bash
 # 方法 1: 使用 ClickHouse Client (如果已安裝)
@@ -161,41 +161,41 @@ pip install -r requirements.txt
 
 ### 6. 啟動 Python Producers
 
-#### 选项 A: 真实数据采集（生产环境）
+#### 選項 A: 真實資料採集（生產環境）
 
-使用脚本启动：
+使用指令碼啟動：
 ```bash
 ./start_producers.sh
 ```
 
-或手动启动：
+或手動啟動：
 ```bash
 # 背景執行
 nohup python steam_top_games_producer.py > logs/top_games.log 2>&1 &
 nohup python steam_game_details_producer.py > logs/game_details.log 2>&1 &
 
-# 查看日誌
+# 檢視日誌
 tail -f logs/top_games.log
 tail -f logs/game_details.log
 ```
 
-**数据量**: ~12 条/分钟（受 Steam API 限制）
+**資料量**: ~12 條/分鐘（受 Steam API 限制）
 
-#### 选项 B: 假数据生成（压力测试）
+#### 選項 B: 假資料生成（壓力測試）
 
-使用假数据生成器进行压力测试：
+使用假資料生成器進行壓力測試：
 ```bash
 ./start_fake_producers.sh
 ```
 
-**数据量**: 30,000 条/秒（可配置）
+**資料量**: 30,000 條/秒（可配置）
 
 **停止 Producers**:
 ```bash
 ./stop_producers.sh
 ```
 
-详细说明见 [SCRIPTS_GUIDE.md](SCRIPTS_GUIDE.md)
+詳細說明見 [SCRIPTS_GUIDE.md](SCRIPTS_GUIDE.md)
 
 ### 7. 驗證資料流
 
@@ -206,7 +206,7 @@ tail -f logs/game_details.log
 clickhouse-client --host localhost --port 9000 --query \
   "SELECT count() FROM steam_top_games"
 
-# 查看最新的 10 筆遊戲資料
+# 檢視最新的 10 筆遊戲資料
 clickhouse-client --host localhost --port 9000 --query \
   "SELECT game_name, current_players, rank, fetch_time
    FROM steam_top_games
@@ -220,7 +220,7 @@ clickhouse-client --host localhost --port 9000 --query \
 
 ### 8. 設定 Grafana Dashboard
 
-1. 打開瀏覽器訪問 `http://localhost:3000`
+1. 開啟瀏覽器訪問 `http://localhost:3000`
 2. 預設帳號密碼: `admin` / `admin`
 3. ClickHouse Data Source 會由 `grafana_datasource.yaml` 自動建立
    - 名稱: `ClickHouse`
@@ -251,49 +251,49 @@ clickhouse-client --host localhost --port 9000 --query \
      - 平均評價
    - **Row 2**: 熱門遊戲排行榜 (Table)
    - **Row 3**: 玩家數時間序列 (Time Series)
-   - **Row 4**: 折扣遊戲 + 遊戲類型分布 (Table + Pie Chart)
+   - **Row 4**: 折扣遊戲 + 遊戲型別分佈 (Table + Pie Chart)
 
 ## 專案檔案說明
 
 ```
 .
-├── 📄 配置文件
+├── 📄 配置檔案
 │   ├── docker-compose.yml                         # Docker 基礎設施設定
 │   ├── clickhouse_schema.sql                      # ClickHouse 資料表定義
 │   ├── grafana_dashboard_provider.yaml            # Grafana Dashboard Provider
-│   ├── grafana_datasource.yaml                    # Grafana 数据源配置
-│   └── requirements.txt                           # Python 依赖包
+│   ├── grafana_datasource.yaml                    # Grafana 資料來源配置
+│   └── requirements.txt                           # Python 依賴包
 │
-├── 📜 脚本文件
-│   ├── setup.sh                                   # 一键初始化脚本
-│   ├── start_producers.sh                         # 启动真实数据 Producers
-│   ├── start_fake_producers.sh                    # 启动假数据生成器
+├── 📜 指令碼檔案
+│   ├── setup.sh                                   # 一鍵初始化指令碼
+│   ├── start_producers.sh                         # 啟動真實資料 Producers
+│   ├── start_fake_producers.sh                    # 啟動假資料生成器
 │   ├── stop_producers.sh                          # 停止所有 Producers
 │   └── recreate_kafka_tables.sh                   # 重建 Kafka Engine 表
 │
-├── 🐍 Python 程序
-│   ├── steam_top_games_producer.py                # 真实数据：热门游戏统计
-│   ├── steam_game_details_producer.py             # 真实数据：游戏详细信息
-│   ├── fake_steam_top_games_producer.py           # 假数据生成器：热门游戏
-│   └── fake_steam_game_details_producer.py        # 假数据生成器：游戏详情
+├── 🐍 Python 程式
+│   ├── steam_top_games_producer.py                # 真實資料：熱門遊戲統計
+│   ├── steam_game_details_producer.py             # 真實資料：遊戲詳細資訊
+│   ├── fake_steam_top_games_producer.py           # 假資料生成器：熱門遊戲
+│   └── fake_steam_game_details_producer.py        # 假資料生成器：遊戲詳情
 │
-├── 📊 Grafana 相关
-│   ├── grafana_dashboards/                        # Dashboard JSON 文件
+├── 📊 Grafana 相關
+│   ├── grafana_dashboards/                        # Dashboard JSON 檔案
 │   │   └── steam-kafka-clickhouse-overview.json
-│   ├── grafana_explore_queries.sql                # Explore 快速查询范本
-│   └── grafana_queries.sql                        # Dashboard 查询范例
+│   ├── grafana_explore_queries.sql                # Explore 快速查詢範本
+│   └── grafana_queries.sql                        # Dashboard 查詢範例
 │
-└── 📚 文档
-    ├── README.md                                  # 项目总览（本文件）
-    ├── DOCS_INDEX.md                              # 文档索引
-    ├── SCRIPTS_GUIDE.md                           # 脚本使用指南
-    ├── QUICK_START.md                             # 快速入门
-    ├── PROJECT_OVERVIEW.md                        # 项目架构概览
-    ├── HIGH_FREQUENCY_CONFIG.md                   # 高频配置说明
+└── 📚 文件
+    ├── README.md                                  # 專案總覽（本檔案）
+    ├── DOCS_INDEX.md                              # 文件索引
+    ├── SCRIPTS_GUIDE.md                           # 指令碼使用指南
+    ├── QUICK_START.md                             # 快速入門
+    ├── PROJECT_OVERVIEW.md                        # 專案架構概覽
+    ├── HIGH_FREQUENCY_CONFIG.md                   # 高頻配置說明
     ├── KAFKA_UI_GUIDE.md                          # Kafka UI 使用指南
-    ├── KAFKA_CLICKHOUSE_LEARNING_GUIDE.md         # 学习指南
-    ├── GRAFANA_CLICKHOUSE_STEP_BY_STEP.md         # Grafana 配置步骤
-    └── ENV_SETUP_GUIDE.md                         # 环境设置指南
+    ├── KAFKA_CLICKHOUSE_LEARNING_GUIDE.md         # 學習指南
+    ├── GRAFANA_CLICKHOUSE_STEP_BY_STEP.md         # Grafana 配置步驟
+    └── ENV_SETUP_GUIDE.md                         # 環境設定指南
 ```
 
 ## 資料結構
@@ -319,7 +319,7 @@ clickhouse-client --host localhost --port 9000 --query \
 | release_date | String | 發行日期 |
 | developers | Array(String) | 開發商 |
 | publishers | Array(String) | 發行商 |
-| genres | Array(String) | 遊戲類型 |
+| genres | Array(String) | 遊戲型別 |
 | original_price | Float32 | 原價 |
 | discount_percent | UInt8 | 折扣百分比 |
 | final_price | Float32 | 最終價格 |
@@ -336,13 +336,13 @@ clickhouse-client --host localhost --port 9000 --query \
 **錯誤訊息**: `KafkaError: Unable to connect to Kafka`
 
 **解決方法**:
-- 確認 Kafka 容器正在運行: `docker ps | grep kafka`
+- 確認 Kafka 容器正在執行: `docker ps | grep kafka`
 - 檢查 Kafka 是否監聽 9092 埠: `netstat -an | grep 9092`
-- 確認 docker-compose.yml 中的埠號映射正確
+- 確認 docker-compose.yml 中的埠號對映正確
 
 ### 2. ClickHouse 無法寫入資料
 
-**症狀**: Producer 正常運行，但 ClickHouse 表中無資料
+**症狀**: Producer 正常執行，但 ClickHouse 表中無資料
 
 **檢查步驟**:
 ```bash
@@ -352,7 +352,7 @@ clickhouse-client --query "SELECT * FROM kafka_steam_top_games LIMIT 10"
 # 2. 檢查 Materialized View 是否正常
 clickhouse-client --query "SHOW CREATE TABLE steam_top_games_mv"
 
-# 3. 查看 ClickHouse 日誌
+# 3. 檢視 ClickHouse 日誌
 docker logs clickhouse-server
 ```
 
@@ -372,7 +372,7 @@ docker logs clickhouse-server
 **檢查**:
 - 確認 ClickHouse Kafka Engine 的 `kafka_num_consumers` 設定
 - 檢查 ClickHouse 系統資源使用率
-- 調整 Grafana 的自動刷新頻率
+- 調整 Grafana 的自動重新整理頻率
 
 ## 效能調優建議
 
@@ -398,19 +398,19 @@ ALTER TABLE steam_top_games ADD INDEX idx_game_name game_name TYPE bloom_filter 
 
 ### Python Producers
 
-1. **使用非同步發送**:
+1. **使用非同步傳送**:
    - 將 `future.get(timeout=10)` 改為非同步模式以提升吞吐量
 
-2. **批次發送**:
-   - 累積多筆資料後一次性發送，減少網路開銷
+2. **批次傳送**:
+   - 累積多筆資料後一次性傳送，減少網路開銷
 
 3. **多執行緒處理**:
    - 使用 threading 或 multiprocessing 並行處理遊戲資料
 
-## 擴展功能建議
+## 擴充套件功能建議
 
 1. **即時警報**:
-   - 在 Grafana 設定 Alert Rules，當特定遊戲玩家數超過閾值時發送通知
+   - 在 Grafana 設定 Alert Rules，當特定遊戲玩家數超過閾值時傳送通知
 
 2. **歷史資料分析**:
    - 保留更長時間的資料，分析遊戲熱度的季節性變化
@@ -421,16 +421,16 @@ ALTER TABLE steam_top_games ADD INDEX idx_game_name game_name TYPE bloom_filter 
 4. **玩家預測**:
    - 使用機器學習模型預測遊戲未來的玩家數趨勢
 
-## 授權與免責聲明
+## 授權與免責宣告
 
 本專案僅供學習和研究使用。使用 Steam API 時請遵守 [Steam Web API 使用條款](https://steamcommunity.com/dev/apiterms)。
 
 ## 相關資源
 
-- [Apache Kafka 官方文件](https://kafka.apache.org/documentation/)
-- [ClickHouse 官方文件](https://clickhouse.com/docs/)
-- [Grafana 官方文件](https://grafana.com/docs/)
-- [Steam Web API 文件](https://developer.valvesoftware.com/wiki/Steam_Web_API)
+- [Apache Kafka 官方檔案](https://kafka.apache.org/documentation/)
+- [ClickHouse 官方檔案](https://clickhouse.com/docs/)
+- [Grafana 官方檔案](https://grafana.com/docs/)
+- [Steam Web API 檔案](https://developer.valvesoftware.com/wiki/Steam_Web_API)
 - [Steam Spy API](https://steamspy.com/api.php)
 
 ## 貢獻
@@ -439,4 +439,4 @@ ALTER TABLE steam_top_games ADD INDEX idx_game_name game_name TYPE bloom_filter 
 
 ## 作者
 
-資深數據工程師 - Steam 數據管線 POC 專案
+資深資料工程師 - Steam 資料管線 POC 專案

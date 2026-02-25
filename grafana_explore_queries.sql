@@ -67,7 +67,7 @@ WHERE g.fetch_time = (SELECT max(fetch_time) FROM steam_top_games)
 ORDER BY g.current_players DESC
 LIMIT 20;
 
--- 6) 類型佔比（以當前玩家數加總）
+-- 6) 型別佔比（以當前玩家數加總）
 SELECT
     genre,
     sum(current_players) AS players

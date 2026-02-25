@@ -1,10 +1,10 @@
 #!/bin/bash
-# Steam 數據管線 Producers 啟動腳本
+# Steam 資料管線 Producers 啟動指令碼
 
 set -e
 
 echo "==========================================="
-echo "Steam 數據管線 Producers 啟動腳本"
+echo "Steam 資料管線 Producers 啟動指令碼"
 echo "==========================================="
 
 # 建立日誌目錄
@@ -30,7 +30,7 @@ echo "✓ Python 套件已安裝"
 # 檢查 Kafka 連線
 echo "檢查 Kafka 連線..."
 if ! docker ps | grep -q kafka; then
-    echo "❌ 錯誤: Kafka 容器未運行"
+    echo "❌ 錯誤: Kafka 容器未執行"
     echo "請先執行: docker-compose up -d"
     exit 1
 fi
@@ -39,14 +39,14 @@ echo "✓ Kafka 連線正常"
 # 檢查 ClickHouse 連線
 echo "檢查 ClickHouse 連線..."
 if ! docker ps | grep -q clickhouse; then
-    echo "❌ 錯誤: ClickHouse 容器未運行"
+    echo "❌ 錯誤: ClickHouse 容器未執行"
     echo "請先執行: docker-compose up -d"
     exit 1
 fi
 echo "✓ ClickHouse 連線正常"
 
-# 停止舊的 Producer 程序
-echo "清理舊的 Producer 程序..."
+# 停止舊的 Producer 程式
+echo "清理舊的 Producer 程式..."
 pkill -f steam_top_games_producer.py || true
 pkill -f steam_game_details_producer.py || true
 sleep 2
@@ -78,7 +78,7 @@ echo "==========================================="
 echo "熱門遊戲 Producer PID: $TOP_GAMES_PID"
 echo "遊戲詳情 Producer PID: $GAME_DETAILS_PID"
 echo ""
-echo "查看日誌:"
+echo "檢視日誌:"
 echo "  tail -f logs/top_games.log"
 echo "  tail -f logs/game_details.log"
 echo ""
