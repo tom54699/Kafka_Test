@@ -1,0 +1,733 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "SELECT sum(current_players) AS value\nFROM steam_top_games\nWHERE fetch_time = (SELECT max(fetch_time) FROM steam_top_games)",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Players (Latest Snapshot)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "SELECT count() AS value\nFROM steam_top_games\nWHERE fetch_time = (SELECT max(fetch_time) FROM steam_top_games)",
+          "refId": "A"
+        }
+      ],
+      "title": "Tracked Games (Latest Snapshot)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 15
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "m"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "SELECT dateDiff('minute', max(fetch_time), now()) AS value\nFROM steam_top_games",
+          "refId": "A"
+        }
+      ],
+      "title": "Data Freshness Lag (min)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "SELECT count() AS value\nFROM steam_top_games\nWHERE fetch_time >= now() - INTERVAL 24 HOUR",
+          "refId": "A"
+        }
+      ],
+      "title": "Records In Last 24h",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "game_name"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "${__value.raw}",
+                    "url": "/d/steam-kafka-overview/steam-kafka-clickhouse-overview?orgId=1&var-game_id=${__data.fields[\"game_id\"]}&from=${__from}&to=${__to}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "game_id"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": false,
+                    "title": "${__value.raw}",
+                    "url": "/d/steam-kafka-overview/steam-kafka-clickhouse-overview?orgId=1&var-game_id=${__value.raw}&from=${__from}&to=${__to}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "WITH latest_names AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name\n  FROM steam_game_details\n  GROUP BY game_id\n),\nlatest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\nlatest_top AS (\n  SELECT\n    g.game_id AS game_id,\n    if(n.game_name != '', n.game_name, any(g.game_name)) AS game_name,\n    max(g.current_players) AS current_players,\n    max(g.peak_today) AS peak_today,\n    max(g.fetch_time) AS fetch_time\n  FROM steam_top_games g\n  CROSS JOIN latest_snapshot s\n  LEFT JOIN latest_names n ON g.game_id = n.game_id\n  WHERE g.fetch_time = s.max_t\n  GROUP BY g.game_id, n.game_name\n)\nSELECT\n  row_number() OVER (ORDER BY current_players DESC) AS rank,\n  game_id,\n  game_name,\n  current_players,\n  peak_today,\n  fetch_time\nFROM latest_top\nORDER BY rank\nLIMIT ${top_n}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Games (點遊戲名稱看趨勢)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "WITH latest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\ndefault_game AS (\n  SELECT game_id\n  FROM steam_top_games\n  WHERE fetch_time = (SELECT max_t FROM latest_snapshot)\n  ORDER BY current_players DESC\n  LIMIT 1\n),\nselected_input AS (\n  SELECT toUInt32OrZero('${game_id}') AS game_id\n),\nvalid_selected AS (\n  SELECT i.game_id\n  FROM selected_input i\n  INNER JOIN (SELECT DISTINCT game_id FROM steam_top_games) s ON s.game_id = i.game_id\n  WHERE i.game_id != 0\n  LIMIT 1\n),\nselected AS (\n  SELECT ifNull((SELECT game_id FROM valid_selected), (SELECT game_id FROM default_game)) AS game_id\n),\nanchor AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games s\n  CROSS JOIN selected sel\n  WHERE s.game_id = sel.game_id\n)\nSELECT\n  toStartOfInterval(s.fetch_time, INTERVAL 10 minute) AS time,\n  avg(s.current_players) AS players\nFROM steam_top_games s\nCROSS JOIN anchor a\nCROSS JOIN selected sel\nWHERE s.game_id = sel.game_id\n  AND s.fetch_time >= a.max_t - INTERVAL 24 HOUR\n  AND s.fetch_time <= a.max_t\nGROUP BY time\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Selected Game Player Trend (last 24h)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "WITH latest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\ntop_games AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name,\n    max(current_players) AS current_players\n  FROM steam_top_games\n  WHERE fetch_time = (SELECT max_t FROM latest_snapshot)\n  GROUP BY game_id\n  ORDER BY current_players DESC\n  LIMIT 5\n),\nname_map AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name\n  FROM steam_game_details\n  GROUP BY game_id\n)\nSELECT\n  toStartOfInterval(s.fetch_time, INTERVAL 10 minute) AS time,\n  if(n.game_name != '', n.game_name, t.game_name) AS metric,\n  avg(s.current_players) AS players\nFROM steam_top_games s\nCROSS JOIN latest_snapshot l\nINNER JOIN top_games t ON s.game_id = t.game_id\nLEFT JOIN name_map n ON s.game_id = n.game_id\nWHERE s.fetch_time >= l.max_t - INTERVAL 24 HOUR\n  AND s.fetch_time <= l.max_t\nGROUP BY time, metric\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 5 Games Trend (latest top 5, last 24h)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "WITH latest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\ntop_latest AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name,\n    max(current_players) AS current_players\n  FROM steam_top_games\n  WHERE fetch_time = (SELECT max_t FROM latest_snapshot)\n  GROUP BY game_id\n),\ndetail_latest AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name,\n    argMax(original_price, fetch_time) AS original_price,\n    argMax(discount_percent, fetch_time) AS discount_percent,\n    argMax(final_price, fetch_time) AS final_price,\n    argMax(review_score, fetch_time) AS review_score,\n    argMax(total_reviews, fetch_time) AS total_reviews\n  FROM steam_game_details\n  GROUP BY game_id\n)\nSELECT\n  row_number() OVER (ORDER BY t.current_players DESC, d.discount_percent DESC) AS rank,\n  if(d.game_name != '', d.game_name, t.game_name) AS game_name,\n  t.current_players,\n  d.original_price,\n  d.discount_percent,\n  d.final_price,\n  d.review_score,\n  d.total_reviews\nFROM top_latest t\nINNER JOIN detail_latest d ON t.game_id = d.game_id\nWHERE d.discount_percent > 0\nORDER BY t.current_players DESC, d.discount_percent DESC\nLIMIT 20",
+          "refId": "A"
+        }
+      ],
+      "title": "Popular Games With Discount",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "clickhouse"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 9,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "clickhouse"
+          },
+          "editorType": "sql",
+          "format": 1,
+          "queryType": "sql",
+          "rawSql": "WITH latest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\nlatest_names AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name\n  FROM steam_game_details\n  GROUP BY game_id\n),\nlatest_top AS (\n  SELECT\n    g.game_id AS game_id,\n    if(n.game_name != '', n.game_name, argMax(g.game_name, g.fetch_time)) AS game_name,\n    max(g.current_players) AS current_players\n  FROM steam_top_games g\n  LEFT JOIN latest_names n ON g.game_id = n.game_id\n  WHERE g.fetch_time = (SELECT max_t FROM latest_snapshot)\n  GROUP BY g.game_id, n.game_name\n)\nSELECT\n  game_name,\n  current_players AS players\nFROM latest_top\nORDER BY players DESC\nLIMIT 10",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 10 Games Share by Current Players",
+      "type": "piechart"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "steam",
+    "kafka",
+    "clickhouse"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "Auto (Top current game)",
+          "value": "0"
+        },
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "clickhouse"
+        },
+        "definition": "WITH latest_names AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name\n  FROM steam_game_details\n  GROUP BY game_id\n),\nlatest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\nlatest_top AS (\n  SELECT\n    g.game_id AS game_id,\n    if(n.game_name != '', n.game_name, any(g.game_name)) AS game_name,\n    max(g.current_players) AS current_players\n  FROM steam_top_games g\n  CROSS JOIN latest_snapshot s\n  LEFT JOIN latest_names n ON g.game_id = n.game_id\n  WHERE g.fetch_time = s.max_t\n  GROUP BY g.game_id, n.game_name\n)\nSELECT __value, __text\nFROM (\n  SELECT\n    '0' AS __value,\n    'Auto (Top current game)' AS __text,\n    0 AS ord,\n    toUInt64(0) AS players\n  UNION ALL\n  SELECT\n    toString(game_id) AS __value,\n    game_name AS __text,\n    1 AS ord,\n    current_players AS players\n  FROM latest_top\n)\nORDER BY ord, players DESC\nLIMIT 101",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Game",
+        "multi": false,
+        "name": "game_id",
+        "options": [],
+        "query": {
+          "query": "WITH latest_names AS (\n  SELECT\n    game_id,\n    argMax(game_name, fetch_time) AS game_name\n  FROM steam_game_details\n  GROUP BY game_id\n),\nlatest_snapshot AS (\n  SELECT max(fetch_time) AS max_t\n  FROM steam_top_games\n),\nlatest_top AS (\n  SELECT\n    g.game_id AS game_id,\n    if(n.game_name != '', n.game_name, any(g.game_name)) AS game_name,\n    max(g.current_players) AS current_players\n  FROM steam_top_games g\n  CROSS JOIN latest_snapshot s\n  LEFT JOIN latest_names n ON g.game_id = n.game_id\n  WHERE g.fetch_time = s.max_t\n  GROUP BY g.game_id, n.game_name\n)\nSELECT __value, __text\nFROM (\n  SELECT\n    '0' AS __value,\n    'Auto (Top current game)' AS __text,\n    0 AS ord,\n    toUInt64(0) AS players\n  UNION ALL\n  SELECT\n    toString(game_id) AS __value,\n    game_name AS __text,\n    1 AS ord,\n    current_players AS players\n  FROM latest_top\n)\nORDER BY ord, players DESC\nLIMIT 101",
+          "queryType": "sql",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "20",
+          "value": "20"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Top N",
+        "multi": false,
+        "name": "top_n",
+        "options": [
+          {
+            "selected": false,
+            "text": "10",
+            "value": "10"
+          },
+          {
+            "selected": true,
+            "text": "20",
+            "value": "20"
+          },
+          {
+            "selected": false,
+            "text": "50",
+            "value": "50"
+          },
+          {
+            "selected": false,
+            "text": "100",
+            "value": "100"
+          }
+        ],
+        "query": "10,20,50,100",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Steam Kafka ClickHouse Overview",
+  "uid": "steam-kafka-overview",
+  "version": 1,
+  "weekStart": ""
+}

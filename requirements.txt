@@ -1,0 +1,13 @@
+# Steam 數據管線專案 Python 依賴套件
+
+# Kafka Client (使用 ng 版本支援新版 Python)
+kafka-python-ng==2.2.2
+
+# HTTP Requests
+requests==2.31.0
+
+# Optional: 更好的日誌顯示
+coloredlogs==15.0.1
+
+# Optional: 環境變數管理
+python-dotenv==1.0.0
