@@ -1,340 +1,104 @@
-# 高頻率資料抓取配置方案
+# 高頻配置與壓測策略
 
-## 方案一：提高更新頻率（學習推薦）
+本文件說明如何調整假資料產生器吞吐量，並用一致流程做效能比較。
 
-適合本地學習、短期執行（1-2 天），資料量增加 10-20 倍。
+## 先確認目前預設
 
-### 修改配置
+目前 `fake` producers 的程式設定值：
 
-編輯 `.env` 檔案：
+- `fake_steam_top_games_producer.py`: `SEND_INTERVAL=0.05`, `BATCH_SIZE=1000`（約 20,000 records/sec）
+- `fake_steam_game_details_producer.py`: `SEND_INTERVAL=0.1`, `BATCH_SIZE=1000`（約 10,000 records/sec）
 
-```env
-# 原始設定（保守）
-TOP_GAMES_FETCH_INTERVAL=600      # 10 分鐘
-GAME_DETAILS_FETCH_INTERVAL=3600  # 1 小時
+總目標吞吐：約 30,000 records/sec。
 
-# 高頻率設定（學習用）
-TOP_GAMES_FETCH_INTERVAL=60       # 1 分鐘
-GAME_DETAILS_FETCH_INTERVAL=300   # 5 分鐘
+## 建議壓測分級
 
-# 增加抓取數量
-TOP_GAMES_COUNT=200               # 增加到 200 款遊戲
+| 級別 | top_games | game_details | 總目標吞吐 | 用途 |
+|---|---|---|---|---|
+| L1 | 0.2s / 200 | 0.2s / 200 | 約 2,000/sec | 基線測試 |
+| L2 | 0.1s / 500 | 0.1s / 500 | 約 10,000/sec | 日常調優 |
+| L3 | 0.05s / 1000 | 0.1s / 1000 | 約 30,000/sec | 高壓測試 |
+| L4 | 0.02s / 1000 | 0.05s / 1000 | 約 70,000/sec | 找極限 |
 
-# 降低 Rate Limit 延遲（風險：可能被限制）
-API_REQUEST_DELAY=1.0             # 從 1.5 秒降到 1 秒
-```
+格式：`SEND_INTERVAL / BATCH_SIZE`。
 
-### 資料量對比
+## 如何調整
 
-| 設定 | 每小時筆數 | 每天筆數 | 說明 |
-|------|-----------|---------|------|
-| **原始** | 700 | 16,800 | 保守安全 |
-| **高頻** | 14,400 | 345,600 | **20 倍資料量** |
+分別修改以下檔案：
 
-### 優點
-- ✅ 資料量大增，更能體驗 Kafka 高吞吐
-- ✅ 更接近真實生產環境的即時性
-- ✅ ClickHouse 查詢更有感
+- `fake_steam_top_games_producer.py`
+- `fake_steam_game_details_producer.py`
 
-### 風險
-- ⚠️ 可能觸發 Steam API Rate Limit
-- ⚠️ CPU 和網路使用率增加
-- ⚠️ 不適合長期執行（建議 1-2 天內測試完畢）
-
----
-
-## 方案二：模擬高頻資料（零風險）
-
-不依賴真實 API，用模擬資料產生大量訊息。
-
-### 建立模擬 Producer
+範例：
 
 ```python
-#!/usr/bin/env python3
-"""
-steam_mock_producer.py - 模擬高頻資料 Producer
-用途：產生大量模擬資料，學習 Kafka 高吞吐能力
-"""
-
-import json
-import time
-import random
-from datetime import datetime
-from kafka import KafkaProducer
-
-# 模擬遊戲列表
-MOCK_GAMES = [
-    {"id": 730, "name": "Counter-Strike 2"},
-    {"id": 570, "name": "Dota 2"},
-    {"id": 1938090, "name": "Call of Duty"},
-    {"id": 271590, "name": "Grand Theft Auto V"},
-    {"id": 1086940, "name": "Baldur's Gate 3"},
-    {"id": 2358720, "name": "Black Myth: Wukong"},
-    {"id": 2778580, "name": "Manor Lords"},
-    {"id": 1245620, "name": "Elden Ring"},
-    {"id": 1172470, "name": "Apex Legends"},
-    {"id": 252490, "name": "Rust"},
-]
-
-producer = KafkaProducer(
-    bootstrap_servers=['localhost:9092'],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
-
-def generate_mock_data():
-    """產生模擬遊戲資料"""
-    data = []
-    for rank, game in enumerate(MOCK_GAMES, 1):
-        # 模擬玩家數變化（加入隨機波動）
-        base_players = 1000000 // rank
-        variance = random.randint(-10000, 10000)
-
-        record = {
-            'game_id': game['id'],
-            'game_name': game['name'],
-            'current_players': max(0, base_players + variance),
-            'peak_today': base_players + random.randint(0, 50000),
-            'rank': rank,
-            'fetch_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        data.append(record)
-    return data
-
-def main():
-    print("🚀 啟動模擬 Producer（每 5 秒產生 100 筆資料）")
-    iteration = 0
-
-    while True:
-        iteration += 1
-        # 產生 100 筆模擬資料
-        mock_data = generate_mock_data() * 10  # 100 筆
-
-        for record in mock_data:
-            producer.send('steam_top_games_topic', value=record)
-
-        producer.flush()
-        print(f"✓ 第 {iteration} 次傳送完成，已傳送 {len(mock_data)} 筆資料")
-
-        time.sleep(5)  # 每 5 秒執行一次
-
-if __name__ == "__main__":
-    main()
+SEND_INTERVAL = 0.1
+BATCH_SIZE = 500
 ```
 
-### 資料量
-
-- **頻率**: 每 5 秒
-- **每次**: 100 筆
-- **每小時**: 72,000 筆
-- **每天**: 1,728,000 筆（**100 倍資料量！**）
-
-### 優點
-- ✅ **零 API 限制風險**
-- ✅ 完全控制資料量和頻率
-- ✅ 可以模擬各種情境（高峰、離峰、異常）
-- ✅ 適合學習和壓力測試
-
-### 缺點
-- ❌ 非真實資料
-- ❌ 無法展示 API 整合能力
-
----
-
-## 方案三：多資料來源混合（生產推薦）
-
-結合真實 API + 模擬資料，平衡真實性與資料量。
-
-### 架構
-
-```
-┌─────────────────┐      ┌─────────────────┐
-│  Real Steam API │      │  Mock Generator │
-│  (每 10 分鐘)    │      │  (每 5 秒)       │
-└────────┬────────┘      └────────┬────────┘
-         │                        │
-         ▼                        ▼
-    ┌────────────────────────────────┐
-    │          Kafka Topic           │
-    └────────────────────────────────┘
-```
-
-### 實作
-
-```python
-#!/usr/bin/env python3
-"""
-hybrid_producer.py - 混合 Producer
-每 10 分鐘抓真實資料 + 每 5 秒產生模擬資料
-"""
-
-import threading
-import time
-from steam_top_games_producer import fetch_and_send_real_data
-from steam_mock_producer import generate_and_send_mock_data
-
-def real_data_worker():
-    """真實資料執行緒（每 10 分鐘）"""
-    while True:
-        fetch_and_send_real_data()
-        time.sleep(600)
-
-def mock_data_worker():
-    """模擬資料執行緒（每 5 秒）"""
-    while True:
-        generate_and_send_mock_data()
-        time.sleep(5)
-
-if __name__ == "__main__":
-    # 啟動兩個執行緒
-    real_thread = threading.Thread(target=real_data_worker, daemon=True)
-    mock_thread = threading.Thread(target=mock_data_worker, daemon=True)
-
-    real_thread.start()
-    mock_thread.start()
-
-    # 保持主程式執行
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("\n停止 Hybrid Producer")
-```
-
-### 資料量
-
-- **真實資料**: 600 筆/小時
-- **模擬資料**: 72,000 筆/小時
-- **總計**: 72,600 筆/小時（**100+ 倍資料量**）
-
----
-
-## 方案四：追蹤所有遊戲（極限方案）
-
-Steam 平臺有超過 70,000 款遊戲，追蹤全部！
-
-### 修改配置
-
-```env
-# 追蹤所有遊戲
-TOP_GAMES_COUNT=5000              # 前 5000 款遊戲
-
-# 批次處理
-BATCH_SIZE=100                    # 每批處理 100 款
-BATCH_INTERVAL=60                 # 每分鐘處理一批
-```
-
-### 資料量
-
-- **每批**: 100 筆
-- **每小時**: 6,000 筆
-- **每天**: 144,000 筆（**8 倍資料量**）
-
-### 風險
-- ⚠️ **非常容易觸發 Rate Limit**
-- ⚠️ 需要多個 API Key 輪替
-- ⚠️ 需要更多資源（CPU、記憶體、磁碟）
-
----
-
-## 推薦方案總結
-
-| 方案 | 資料量倍數 | API 風險 | 適合場景 |
-|------|-----------|---------|---------|
-| **方案一：高頻率** | 20x | ⚠️ 中等 | 短期學習（1-2 天） |
-| **方案二：模擬資料** | 100x | ✅ 無 | **學習 Kafka 推薦** |
-| **方案三：混合** | 100x | ⚠️ 低 | **最佳平衡** |
-| **方案四：全量追蹤** | 8x | ❌ 高 | 生產環境（需多 Key） |
-
----
-
-## 立即開始：快速修改指令
-
-### 方案一：高頻率（最簡單）
+修改後重啟：
 
 ```bash
-# 1. 修改 .env
-nano .env
-
-# 修改這兩行：
-# TOP_GAMES_FETCH_INTERVAL=60
-# GAME_DETAILS_FETCH_INTERVAL=300
-
-# 2. 重啟 Producers
 ./stop_producers.sh
-./start_producers.sh
-
-# 3. 觀察資料流
-tail -f logs/top_games.log
+./start_fake_producers.sh
 ```
 
-### 方案二：模擬資料（推薦）
+## 壓測建議流程
 
-已為你建立 `steam_mock_producer.py`，立即執行：
+1. 選一個級別，固定跑 20 分鐘。
+2. 記錄寫入速率、lag、查詢延遲、資源占用。
+3. 只改一個變數再測（避免變因混雜）。
+4. 對照結果，找出瓶頸位置。
+
+完整模板見 [PERFORMANCE_ANALYSIS.md](PERFORMANCE_ANALYSIS.md)。
+
+## 核心觀察指標
+
+### Kafka lag
 
 ```bash
-# 1. 啟動模擬 Producer
-python steam_mock_producer.py
-
-# 2. 另開終端檢視 Kafka
-docker exec kafka kafka-console-consumer \
-  --topic steam_top_games_topic \
-  --bootstrap-server localhost:9092
-
-# 3. 檢視 ClickHouse 資料量
-docker exec clickhouse-server clickhouse-client --query \
-  "SELECT count() FROM steam_top_games"
+docker exec kafka kafka-consumer-groups \
+  --bootstrap-server localhost:9092 \
+  --describe \
+  --group clickhouse_steam_top_games_consumer
 ```
 
----
-
-## 監控資料流量
-
-### Kafka 吞吐量
-
-```bash
-# 檢視 Topic 訊息數
-docker exec kafka kafka-run-class kafka.tools.GetOffsetShell \
-  --broker-list localhost:9092 \
-  --topic steam_top_games_topic
-
-# 檢視 Consumer Lag
-docker exec kafka kafka-consumer-groups --describe \
-  --group clickhouse_steam_top_games_consumer \
-  --bootstrap-server localhost:9092
-```
-
-### ClickHouse 寫入速度
+### ClickHouse 寫入速率
 
 ```sql
--- 檢視每分鐘寫入筆數
 SELECT
-    toStartOfMinute(fetch_time) as minute,
-    count() as records
+    toStartOfMinute(fetch_time) AS minute,
+    count() AS rows
 FROM steam_top_games
-WHERE fetch_time >= now() - INTERVAL 1 HOUR
+WHERE fetch_time >= now() - INTERVAL 30 MINUTE
 GROUP BY minute
 ORDER BY minute DESC;
 ```
 
----
+### 查詢延遲
 
-## 我的建議
+```sql
+SELECT
+    query_duration_ms,
+    read_rows,
+    memory_usage,
+    event_time
+FROM system.query_log
+WHERE type = 'QueryFinish'
+  AND event_time >= now() - INTERVAL 15 MINUTE
+ORDER BY event_time DESC
+LIMIT 50;
+```
 
-對於**學習 Kafka + ClickHouse**：
+### 系統資源
 
-1. **第一天**: 使用**方案二（模擬資料）**
-   - 產生大量資料，體驗高吞吐
-   - 測試 ClickHouse 查詢效能
-   - 學習 Kafka 的平行處理
+```bash
+docker stats --no-stream kafka clickhouse-server grafana
+```
 
-2. **第二天**: 使用**方案三（混合）**
-   - 保留真實 API 整合
-   - 加入模擬資料增加量
-   - 更貼近生產環境
+## 常見瓶頸判讀
 
-3. **第三天**: 使用**方案一（高頻率）**
-   - 測試真實 API 的限制
-   - 學習錯誤處理和重試機制
-   - 瞭解 Rate Limit 的影響
-
-這樣你可以在**3 天內完整體驗**從模擬到真實的完整資料管線！
+- Lag 持續上升：ClickHouse 消費/寫入能力不足
+- Lag 偶發尖峰：瞬時流量突增或 flush 週期影響
+- 查詢慢但 lag 穩定：多半是 SQL 或資料模型問題
+- CPU 長時間滿載：優先檢查 consumer 數與 batch 參數

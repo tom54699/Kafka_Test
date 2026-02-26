@@ -64,7 +64,7 @@ echo "啟動假資料生成器 - 熱門遊戲統計..."
 nohup python fake_steam_top_games_producer.py > logs/fake_top_games.log 2>&1 &
 FAKE_TOP_GAMES_PID=$!
 echo "✓ PID: $FAKE_TOP_GAMES_PID"
-echo "  預估吞吐量: 50 條/秒"
+echo "  預估吞吐量: 20,000 條/秒"
 
 sleep 2
 
@@ -73,16 +73,16 @@ echo "啟動假資料生成器 - 遊戲詳細資訊..."
 nohup python fake_steam_game_details_producer.py > logs/fake_game_details.log 2>&1 &
 FAKE_GAME_DETAILS_PID=$!
 echo "✓ PID: $FAKE_GAME_DETAILS_PID"
-echo "  預估吞吐量: 10 條/秒"
+echo "  預估吞吐量: 10,000 條/秒"
 
 echo ""
 echo "==========================================="
 echo "所有假資料生成器已啟動"
 echo "==========================================="
-echo "熱門遊戲生成器 PID: $FAKE_TOP_GAMES_PID (50 條/秒)"
-echo "遊戲詳情生成器 PID: $FAKE_GAME_DETAILS_PID (10 條/秒)"
+echo "熱門遊戲生成器 PID: $FAKE_TOP_GAMES_PID (20,000 條/秒)"
+echo "遊戲詳情生成器 PID: $FAKE_GAME_DETAILS_PID (10,000 條/秒)"
 echo ""
-echo "總吞吐量: 約 60 條/秒 = 3600 條/分鐘"
+echo "總吞吐量: 約 30,000 條/秒 = 1,800,000 條/分鐘"
 echo ""
 echo "檢視即時日誌:"
 echo "  tail -f logs/fake_top_games.log"
